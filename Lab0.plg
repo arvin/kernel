@@ -1,0 +1,131 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+N:\SE350\Final\Lab0.uvproj
+Project File Date:  01/29/2013
+
+<h2>Output:</h2>
+Rebuild target 'HelloWorld SIM'
+assembling startup_LPC17xx.s...
+compiling system_LPC17xx.c...
+compiling uart_polling.c...
+compiling main.c...
+compiling process.c...
+compiling userproc.c...
+userproc.c(14): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(11): warning:  #177-D: variable "errorFlag" was declared but never referenced
+userproc.c(35): warning:  #174-D: expression has no effect
+userproc.c(36): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(70): warning:  #174-D: expression has no effect
+userproc.c(71): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(73): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(84): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(95): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(119): warning:  #1-D: last line of file ends without a newline
+compiling HAL.c...
+compiling memory.c...
+linking...
+Program Size: Code=3036 RO-data=372 RW-data=32 ZI-data=632  
+"Lab0.axf" - 0 Error(s), 10 Warning(s).
+Load "N:\\SE350\\Final\\Lab0.AXF" 
+No Algorithm found for: 10000000H - 10000D6BH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10000D6BH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Rebuild target 'HelloWorld SIM'
+assembling startup_LPC17xx.s...
+compiling system_LPC17xx.c...
+compiling uart_polling.c...
+compiling main.c...
+compiling process.c...
+compiling userproc.c...
+userproc.c(14): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(11): warning:  #177-D: variable "errorFlag" was declared but never referenced
+userproc.c(35): warning:  #174-D: expression has no effect
+userproc.c(36): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(70): warning:  #174-D: expression has no effect
+userproc.c(71): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(73): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(84): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(95): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(119): warning:  #1-D: last line of file ends without a newline
+compiling HAL.c...
+compiling memory.c...
+linking...
+Program Size: Code=3036 RO-data=372 RW-data=32 ZI-data=632  
+"Lab0.axf" - 0 Error(s), 10 Warning(s).
+Load "N:\\SE350\\Final\\Lab0.AXF" 
+No Algorithm found for: 10000000H - 10000D6BH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10000D6BH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+userproc.c(14): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(11): warning:  #177-D: variable "errorFlag" was declared but never referenced
+userproc.c(35): warning:  #174-D: expression has no effect
+userproc.c(36): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(62): warning:  #223-D: function "uart1_put_hex" declared implicitly
+userproc.c(72): warning:  #174-D: expression has no effect
+userproc.c(73): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(75): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(86): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(97): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(121): warning:  #1-D: last line of file ends without a newline
+linking...
+Program Size: Code=3048 RO-data=372 RW-data=32 ZI-data=632  
+"Lab0.axf" - 0 Error(s), 11 Warning(s).
+Load "N:\\SE350\\Final\\Lab0.AXF" 
+No Algorithm found for: 10000000H - 10000D77H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10000D77H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Rebuild target 'HelloWorld SIM'
+assembling startup_LPC17xx.s...
+compiling system_LPC17xx.c...
+compiling uart_polling.c...
+compiling main.c...
+compiling process.c...
+compiling userproc.c...
+userproc.c(14): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(11): warning:  #177-D: variable "errorFlag" was declared but never referenced
+userproc.c(35): warning:  #174-D: expression has no effect
+userproc.c(36): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(60): warning:  #223-D: function "uart1_put_hex" declared implicitly
+userproc.c(71): warning:  #174-D: expression has no effect
+userproc.c(72): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(74): warning:  #223-D: function "s_release_memory_block" declared implicitly
+userproc.c(85): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(96): warning:  #223-D: function "set_process_priority" declared implicitly
+userproc.c(120): warning:  #1-D: last line of file ends without a newline
+compiling HAL.c...
+compiling memory.c...
+linking...
+Program Size: Code=3044 RO-data=372 RW-data=32 ZI-data=632  
+"Lab0.axf" - 0 Error(s), 11 Warning(s).
+Load "N:\\SE350\\Final\\Lab0.AXF" 
+No Algorithm found for: 10000000H - 10000D73H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10000D73H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling main.c...
+compiling process.c...
+compiling memory.c...
+linking...
+Program Size: Code=3040 RO-data=372 RW-data=32 ZI-data=632  
+"Lab0.axf" - 0 Error(s), 0 Warning(s).
+Load "N:\\SE350\\Final\\Lab0.AXF" 
+No Algorithm found for: 10000000H - 10000D6FH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10000D6FH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Clean started: Project: 'Lab0'
+   deleting intermediate output files for target 'HelloWorld SIM'
