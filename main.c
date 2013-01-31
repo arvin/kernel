@@ -19,7 +19,7 @@ int main(){
 	uart1_put_string("Hello World!\n\r");
 
 	__set_CONTROL(__get_CONTROL() | BIT(0));
-	release_processor();
+	manage_processor();
 	
 	
 /*	for(i = 0; i < 32; i++){

@@ -12,11 +12,12 @@ typedef unsigned int U32;
 #define __SVC_0  __svc_indirect(0)
 
 extern int k_release_processor(void);
-#define release_processor() _release_processor((U32)k_release_processor)
+#define manage_processor() _release_processor((U32)k_release_processor)
 int __SVC_0 _release_processor(U32 p_func);
 //int _release_processor(U32 p_func) __SVC_0; // __SVC_0 can also be at the end
 
 extern int add_new_process(void*);
+extern int release_processor(void);
 extern void* s_requestion_memory_block(void);
 
 #endif /* !_RTX_H_ */

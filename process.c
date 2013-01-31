@@ -17,6 +17,7 @@
 #include "uart_polling.h"
 #include "process.h"
 #include "userproc.h"
+#include "rtx.h"
 
 #ifdef DEBUG_0
 #include <stdio.h>
@@ -25,6 +26,7 @@
 pcb_t  *gp_current_process = NULL; /* always point to the current process */
 
 ProcessQueue* readyQueue;
+ProcessQueue** blockedQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
 
@@ -56,11 +58,20 @@ void null_process(void) {
 }
 
 void process_init() {
-  //Ready Queue
+  int i;
+	//Ready Queue
 	readyQueue = (ProcessQueue*)s_requestion_memory_block();
 	readyQueue->first = NULL;
 	readyQueue->last = NULL;
 	readyQueue->size = 0;
+	
+	blockedQueues = (ProcessQueue**)s_requestion_memory_block();
+	for (i = 0; i < PRIORITY_COUNT; ++i) {
+		blockedQueues[i] = (ProcessQueue*)s_requestion_memory_block();
+		blockedQueues[i]->first = NULL;
+		blockedQueues[i]->last = NULL;
+		blockedQueues[i]->size = 0;
+	}
 
 	curProcess = NULL;
 	nullProcessNode = (ProcessNode*)s_requestion_memory_block();
@@ -110,14 +121,15 @@ int get_process_priority(int process_ID) {
  *POST: if gp_current_process was NULL, then it gets set to &pcb1.
  *      No other effect on other global variables.
  */
-int scheduler(void){
+ProcessNode* scheduler(void){
 	if (curProcess == NULL) {
-	  curProcess = readyQueue->first;		
-	  return curProcess->pcb.m_pid;
-	} else if(readyQueue->first != NULL){
-		return readyQueue->first->next->pcb.m_pid;
+	  curProcess = poll_process(readyQueue);
+	  return curProcess;
 	}
-	return nullProcessNode->pcb.m_pid;
+	else if (readyQueue->first != NULL) {
+		return poll_process(readyQueue);
+	}
+	return nullProcessNode;
 }
 
 void init_pcb(void* process, ProcessNode* node, int priority) {
@@ -163,6 +175,50 @@ int add_new_prioritized_process(void* process, int priority) {
 	return 0;
 }
 
+int release_processor() {
+	return release_processor_to_queue(RDY);
+}
+
+int release_processor_to_queue(proc_state_t newState) {
+	curProcess->pcb.m_state = newState;
+	switch (newState) {
+		case RDY:
+			push_process(readyQueue, curProcess);
+			break;
+		case INSUFFICIENT_MEMORY:
+			push_process(blockedQueues[curProcess->pcb.priority], curProcess);
+			break;
+	}
+	manage_processor();
+	return 0;
+}
+
+ProcessNode* poll_process(ProcessQueue* queue) {
+	ProcessNode* node = queue->first;
+	if (node == NULL) {
+		return NULL;
+	}
+	queue->first = node->next;
+	if (queue->first == NULL) {
+		queue->last = NULL;
+	}
+	node->next = NULL;
+	queue->size--;
+	return node;
+}
+
+void push_process(ProcessQueue* queue, ProcessNode* node) {
+	if (queue->first == NULL) {
+		queue->first = node;
+	}
+	else {
+		queue->last->next = node;
+	}
+	queue->last = node;
+	node->next = NULL;
+	queue->size++;
+}
+
 /**
  * @brief release_processor(). 
  * @return -1 on error and zero on success
@@ -171,49 +227,53 @@ int add_new_prioritized_process(void* process, int priority) {
 int k_release_processor(void)
 {
 	volatile int i;
-	volatile int pid;
 	volatile proc_state_t state;
 	ProcessNode *oldProcess = NULL;
+	ProcessNode *newProcess = NULL;
 
-	pid = scheduler();
+	unblock_process();
+	newProcess = scheduler();
 	if (curProcess == NULL) {
 	 return -1;
 	}
-
 	
 	oldProcess = curProcess;
-	 
-	if(oldProcess->pcb.m_pid != pid){
-		curProcess = readyQueue->first->next;
-		readyQueue->first = curProcess;
-		readyQueue->last->next = oldProcess;
-		readyQueue->last = oldProcess;
-		oldProcess->next = NULL;
-	}
+	curProcess = newProcess;
 
 	state = curProcess->pcb.m_state;
 
 	if (state == NEW) {
 		if (oldProcess->pcb.m_state != NEW) {
-			oldProcess->pcb.m_state = RDY;
 			oldProcess->pcb.mp_sp = (uint32_t *) __get_MSP();
 		}
 		curProcess->pcb.m_state = RUN;
 		__set_MSP((uint32_t) curProcess->pcb.mp_sp);
-		//for (i = 0; i <8; ++i)
-			//uart1_put_hex(*((int*)(gp_current_process->mp_sp + i)));
-
 		__rte();  /* pop exception stack frame from the stack for a new process */
-	} else if (state == RDY){     
-		oldProcess->pcb.m_state = RDY; 
+	} else if (state == RDY) {   
 		oldProcess->pcb.mp_sp = (uint32_t *) __get_MSP(); /* save the old process's sp */
-	 
 		curProcess->pcb.m_state = RUN;
 		__set_MSP((uint32_t) curProcess->pcb.mp_sp); /* switch to the new proc's stack */		
 	} else {
 		curProcess = oldProcess; /* revert back to the old proc on error */
+		uart1_put_hex(curProcess->pcb.m_pid);
 		uart1_put_string("GAHTHISSHOULDNOTHAPPEN\n\r");
 		 return -1;
 	}	 	 
 	return 0;
+}
+
+void unblock_process() {
+	int i;
+	ProcessNode* node;
+	if (!hasFreeMemory())
+		return;
+	
+	for (i = 0; i < 3; ++i) {
+		node = poll_process(blockedQueues[i]);
+		if (node != NULL) {
+			node->pcb.m_state = RDY;
+			push_process(readyQueue, node);
+			return;
+		}
+	}
 }

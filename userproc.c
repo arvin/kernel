@@ -5,7 +5,7 @@
 #include <stdio.h>
 #endif  /* DEBUG_0 */
 
-
+#define true 1
 
 void proc1(void) {
 	int errorFlag = 1;
@@ -16,14 +16,17 @@ void proc1(void) {
 	else
 		uart1_put_string("FAILED\n\r");
 	
-	release_processor();
+	do
+		release_processor();
+	while (true);
 }
 
 void proc2(void){
-	uart1_put_string("Test 2: Release processor (passed if no error messages are shown)\n\r");
-  release_processor();
-	uart1_put_string("FAILED\n\r");
+	uart1_put_string("Test 2: Release processor (passed if gets to test 3)\n\r");
 	
+  do
+		release_processor();
+	while (true);
 }
 
 void proc3(void){
@@ -40,75 +43,89 @@ void proc3(void){
 		uart1_put_string("FAILED\n\r");
 	else
 		uart1_put_string("PASSED\n\r");
-	release_processor();
+	
+	do
+		release_processor();
+	while (true);
 	
 }
 
 void proc4(void){
 	//Allocate to max and then deallocate all
-	void** arr;
+	void** arr[3];
 	int i = 0;
 	int errorFlag = 0;
-	int reachMax = -1;
 	
-	uart1_put_string("Test 4a: Allocate 32 blocks.\n\r");
-	arr = s_requestion_memory_block();
+	uart1_put_string("Test 4a: Allocate 95 blocks.\n\r");
+	for (i = 0; i < 3; ++i)
+		arr[i] = s_requestion_memory_block();
 	
-	while(reachMax != 0 && i < 31) {
-		arr[i] = (void *)s_requestion_memory_block();
-		reachMax = (uint32_t)arr[i];
-		uart1_put_hex(arr[i]);
+	i = 0;
+	while(i < 92) {
+		arr[i/32][i%32] = (void *)s_requestion_memory_block();
 		i++;
 	}
-	if (i == 31) 
-		uart1_put_string("PASSED\n\r");
-	else
-		uart1_put_string("FAILED\n\r");
 	
-	uart1_put_string("Test 4b: Deallocate 32 blocks.\n\r");
+	release_processor();
+	
+	uart1_put_string("Test 4b: Deallocate 94 blocks.\n\r");
 	i--;
 	
 	for(i; i >=0; i--) {
-		errorFlag |= s_release_memory_block(arr[i]);
+		errorFlag |= s_release_memory_block(arr[i/32][i%32]);
 	}
-	errorFlag |= s_release_memory_block(arr);
+	for (i = 0; i < 3; ++i)
+		errorFlag |= s_release_memory_block(arr[i]);
 	
 	if (errorFlag)
 		uart1_put_string("FAILED\n\r");
 	else
 		uart1_put_string("PASSED\n\r");
 	
-	release_processor();
+	do
+		release_processor();
+	while (true);
 }
 
 void proc5(void) {
+	void* block;
+	uart1_put_string("Test 5: Request for memory block while all memory blocks are used.\n\r");
+	block = s_requestion_memory_block();
+	uart1_put_string("This message should be printed only if blocks within test 4 are deallocated.\n\r");
+	
+	do
+		release_processor();
+	while (true);
+}
+
+void proc6(void) {
 	int result = set_process_priority(1, 2);
-	uart1_put_string("Test 5: Set priority to a valid number.\n\r");
+	uart1_put_string("Test 6a: Set priority to a valid number.\n\r");
 	if(result == 0)
 		uart1_put_string("PASSED\n\r");
 	else
 		uart1_put_string("FAILED\n\r");
 	
-	release_processor();
-}
-
-void proc6(void) {
-	int result = set_process_priority(1, 9000);
+	result = set_process_priority(1, 9000);
 	
-	uart1_put_string("Test 6a: Set priority to an invalid number.\n\r");
+	uart1_put_string("Test 6b: Set priority to an invalid number.\n\r");
 	if(result == -1)
 		uart1_put_string("PASSED.\n\r");
 	else
 		uart1_put_string("FAILED.\n\r");
 	
-	uart1_put_string("Test 6b: Setting priority of null process should be prohibited.\n\r");
+	uart1_put_string("Test 6c: Setting priority of null process should be prohibited.\n\r");
 	set_process_priority(0, 1);
 	if(result == -1)
 		uart1_put_string("PASSED\n\r");
 	else
 		uart1_put_string("FAILED\n\r");
 	
+	do
+		release_processor();
+	while (true);
 }
+
 
 void assign_processes() {
   add_new_process(&proc1);

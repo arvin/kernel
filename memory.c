@@ -1,5 +1,6 @@
 #include <LPC17xx.h>
 #include "memory.h"
+#include "process.h"
 #include "uart_polling.h"
 
 extern void* Image$$RW_IRAM1$$ZI$$Limit;
@@ -89,15 +90,24 @@ int s_release_memory_block(void* memory_block){
 }
 
 void *s_requestion_memory_block() {
+	void* block = k_request_memory_block();
+	while (block == NULL) {
+		release_processor_to_queue(INSUFFICIENT_MEMORY);
+		block = k_request_memory_block();
+	}
+	return block;
+}
+
+void* k_request_memory_block() {
 	Node* currentNode;
 	uint32_t block;
 	
-	if(FreeMemoryList->first  != NULL){
+	if(FreeMemoryList->first != NULL){
 		currentNode = getBlockFromFreeLinkedList();
 		block = (uint32_t)currentNode + (uint32_t)(sizeof(Node));
 	}		
 	//search for memory block in pool
-	else if (MemoryList->newStartingAddress >= MemoryEnd){
+	else if (hasUnusedMemory()){
 		//free linked list -> check.
 		return NULL;
 	}else{
@@ -108,4 +118,12 @@ void *s_requestion_memory_block() {
 	insertToList(MemoryList, currentNode);
 	
 	return (void*)block;
+}
+
+int hasFreeMemory() {
+	return FreeMemoryList->first != NULL || hasUnusedMemory();
+}
+
+int hasUnusedMemory() {
+	return (MemoryList->newStartingAddress + 32 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node) >= MemoryEnd);
 }
