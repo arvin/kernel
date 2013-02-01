@@ -14,32 +14,13 @@ int main(){
 	process_init();
 	
 	__enable_irq();
-	// initialize memory
 	
-	uart1_put_string("Hello World!\n\r");
+	uart1_put_string("======================================\n\r");
+	uart1_put_string("RTX has been initialized successfully.\n\r");
+	uart1_put_string("======================================\n\r\n\r");
 
 	__set_CONTROL(__get_CONTROL() | BIT(0));
 	manage_processor();
 	
-	
-/*	for(i = 0; i < 32; i++){
-		arr[i] = s_requestion_memory_block();	
-	}
-	
-	for(i = 0; i < 32; i++){
-		s_release_memory_block(arr[i]);	
-	}
-	
-	
-	s_release_memory_block(a);
-	s_release_memory_block(a);
-	a = s_requestion_memory_block();
-	s_release_memory_block(a);
-	a = s_requestion_memory_block();
-	s_release_memory_block(a);
-	a = s_requestion_memory_block();
-	//__enable_irq();
-	uart1_put_string("Goodbye Cruel World!\n\r");
-	*/
 	return 0;
 }

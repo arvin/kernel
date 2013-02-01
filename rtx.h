@@ -19,5 +19,8 @@ int __SVC_0 _release_processor(U32 p_func);
 extern int add_new_process(void*);
 extern int release_processor(void);
 extern void* s_requestion_memory_block(void);
+extern int s_release_memory_block(void* memory_block);
+extern int set_process_priority(int process_ID, int priority);
+extern int get_process_priority(int process_ID);
 
 #endif /* !_RTX_H_ */

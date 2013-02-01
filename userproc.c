@@ -8,7 +8,6 @@
 #define true 1
 
 void proc1(void) {
-	int errorFlag = 1;
 	uart1_put_string("Test 1: Deallocate non-existing blocks.\n\r");
 	
 	if (s_release_memory_block(0))
@@ -30,12 +29,12 @@ void proc2(void){
 }
 
 void proc3(void){
-	int i = 0;
+	int i;
 	int errorFlag = 0;
 	
 	uart1_put_string("Test 3: Allocate and deallocate memory 50 times.\n\r");
 	
-	for(i; i < 50; i++){
+	for(i = 0; i < 50; i++){
 		errorFlag |= s_release_memory_block(s_requestion_memory_block());
 	}
 	
@@ -71,8 +70,9 @@ void proc4(void){
 	uart1_put_string("Test 4b: Deallocate 94 blocks.\n\r");
 	i--;
 	
-	for(i; i >=0; i--) {
+	while(i >= 0) {
 		errorFlag |= s_release_memory_block(arr[i/32][i%32]);
+		i--;
 	}
 	for (i = 0; i < 3; ++i)
 		errorFlag |= s_release_memory_block(arr[i]);
@@ -91,6 +91,7 @@ void proc5(void) {
 	void* block;
 	uart1_put_string("Test 5: Request for memory block while all memory blocks are used.\n\r");
 	block = s_requestion_memory_block();
+	s_release_memory_block(block);
 	uart1_put_string("This message should be printed only if blocks within test 4 are deallocated.\n\r");
 	
 	do

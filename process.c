@@ -1,18 +1,3 @@
-/**
- * @file:  process.c
- * @brief: process management source file
- * @author Irene Huang
- * @author Thomas Reidemeister
- * @date   2013/01/12
- * NOTE: The example code shows one way of context switching implmentation.
- *       The code only has minimal sanity check. There is no stack overflow check.
- *       The implementation assumes only two simple user processes, NO external interrupts. 
- *  	   The purpose is to show how context switch could be done under stated assumptions. 
- *       These assumptions are not true in the required RTX Project!!!
- *       If you decide to use this piece of code, you need to understand the assumptions and
- *       the limitations. Some part of the code is not written in the most efficient way.
- */
-
 #include <LPC17xx.h>
 #include "uart_polling.h"
 #include "process.h"
@@ -23,8 +8,6 @@
 #include <stdio.h>
 #endif  /* DEBUG_0 */
 
-pcb_t  *gp_current_process = NULL; /* always point to the current process */
-
 ProcessQueue* readyQueue;
 ProcessQueue** blockedQueues;
 ProcessNode* curProcess;
@@ -32,15 +15,6 @@ ProcessNode* nullProcessNode;
 
 int newProcessId = 0;				/* Must be unique */
 
-/**
- * @biref: initialize all processes in the system
- * NOTE: We assume there are only two user processes in the system in this example.
- *       We should have used an array or linked list pcbs so the repetive coding
- *       can be eliminated.
- *       We should have also used an initialization table which contains the entry
- *       points of each process so that this code does not have to hard code
- *       proc1 and proc2 symbols. We leave all these imperfections as excercies to the reader 
- */
 
 void null_process(void) {
 	while(1) {
@@ -50,12 +24,13 @@ void null_process(void) {
 
 void process_init() {
   int i;
-	//Ready Queue
+	// Ready queue initialization
 	readyQueue = (ProcessQueue*)s_requestion_memory_block();
 	readyQueue->first = NULL;
 	readyQueue->last = NULL;
 	readyQueue->size = 0;
 	
+	// Blocked queues initialization
 	blockedQueues = (ProcessQueue**)s_requestion_memory_block();
 	for (i = 0; i < PRIORITY_COUNT; ++i) {
 		blockedQueues[i] = (ProcessQueue*)s_requestion_memory_block();
@@ -64,10 +39,12 @@ void process_init() {
 		blockedQueues[i]->size = 0;
 	}
 
+	// Null process initialization
 	curProcess = NULL;
 	nullProcessNode = (ProcessNode*)s_requestion_memory_block();
 	init_pcb(&null_process, nullProcessNode, 4);
 	
+	// User processes initialization
 	assign_processes();
 }
 
@@ -106,14 +83,10 @@ int get_process_priority(int process_ID) {
 	return -1;
 }
 
-/*@brief: scheduler, pick the pid of the next to run process
- *@return: pid of the next to run process
- *         -1 if error happens
- *POST: if gp_current_process was NULL, then it gets set to &pcb1.
- *      No other effect on other global variables.
- */
+// Return the process that should be executed
 ProcessNode* scheduler(void){
 	if (curProcess == NULL) {
+		// First time executing
 	  curProcess = poll_process(readyQueue);
 	  return curProcess;
 	}
@@ -128,9 +101,12 @@ void init_pcb(void* process, ProcessNode* node, int priority) {
 	uint32_t* stackBlockStart = (uint32_t*)s_requestion_memory_block();
 	node->next = NULL;
 	
+	// PCB initialization
 	node->pcb.m_pid = newProcessId++;
 	node->pcb.priority = priority;
 	node->pcb.m_state = NEW;
+	
+	// Stack initialization
 	node->pcb.mp_sp = stackBlockStart + USR_SZ_STACK;
 	node->pcb.mp_sp--;
 	/* 8 bytes alignment adjustment to exception stack frame */
@@ -146,11 +122,12 @@ void init_pcb(void* process, ProcessNode* node, int priority) {
 	}
 }
 
-// This is for user process
+// This is an API call for creating new user processes
 int add_new_process(void* process) {
 	return add_new_prioritized_process(process, 3);
 }
 
+// This is an internal call for creating new processes
 int add_new_prioritized_process(void* process, int priority) {
 	ProcessNode* node = (ProcessNode*)s_requestion_memory_block();
 	
@@ -166,10 +143,12 @@ int add_new_prioritized_process(void* process, int priority) {
 	return 0;
 }
 
+// This is an API call for relasing current user process
 int release_processor() {
 	return release_processor_to_queue(RDY);
 }
 
+// This is an internal API call for releasing current process with a new specified state
 int release_processor_to_queue(proc_state_t newState) {
 	curProcess->pcb.m_state = newState;
 	switch (newState) {
@@ -184,6 +163,7 @@ int release_processor_to_queue(proc_state_t newState) {
 	return 0;
 }
 
+// Remove first process from the specified queue
 ProcessNode* poll_process(ProcessQueue* queue) {
 	ProcessNode* node = queue->first;
 	if (node == NULL) {
@@ -198,6 +178,7 @@ ProcessNode* poll_process(ProcessQueue* queue) {
 	return node;
 }
 
+// Add process to the back of the specified queue
 void push_process(ProcessQueue* queue, ProcessNode* node) {
 	if (queue->first == NULL) {
 		queue->first = node;
@@ -210,11 +191,7 @@ void push_process(ProcessQueue* queue, ProcessNode* node) {
 	queue->size++;
 }
 
-/**
- * @brief release_processor(). 
- * @return -1 on error and zero on success
- * POST: gp_current_process gets updated
- */
+// Internal call for releasing processor
 int k_release_processor(void)
 {
 	volatile int i;
@@ -222,6 +199,7 @@ int k_release_processor(void)
 	ProcessNode *oldProcess = NULL;
 	ProcessNode *newProcess = NULL;
 
+	// Unblock any processes if possible
 	unblock_process();
 	newProcess = scheduler();
 	if (curProcess == NULL) {
@@ -246,13 +224,14 @@ int k_release_processor(void)
 		__set_MSP((uint32_t) curProcess->pcb.mp_sp); /* switch to the new proc's stack */		
 	} else {
 		curProcess = oldProcess; /* revert back to the old proc on error */
+		uart1_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
 		uart1_put_hex(curProcess->pcb.m_pid);
-		uart1_put_string("GAHTHISSHOULDNOTHAPPEN\n\r");
 		 return -1;
 	}	 	 
 	return 0;
 }
 
+// If memory is available, unblock the process with the highest priority
 void unblock_process() {
 	int i;
 	ProcessNode* node;

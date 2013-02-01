@@ -24,7 +24,7 @@ struct LinkedList
 
 void memory_init(void);
 
-void GetNewStartingAddress(void);
+void setNewStartingAddress(void);
 
 Node* getBlockFromFreeLinkedList(void);
 
