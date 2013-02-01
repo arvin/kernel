@@ -42,5 +42,6 @@ int uart_init(int n_uart);      /* initialize the n_uart       */
 int uart_get_char(int n_uart);  /* read a char from the n_uart */
 int uart_put_char(int n_uart, unsigned char c);   /* write a char   to n_uart */
 int uart_put_string(int n_uart, unsigned char *s);/* write a string to n_uart */
+void uart1_put_hex(int val);
 
 #endif /* ! _UART_POLLING_H_ */

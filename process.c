@@ -42,15 +42,6 @@ int newProcessId = 0;				/* Must be unique */
  *       proc1 and proc2 symbols. We leave all these imperfections as excercies to the reader 
  */
 
-void uart1_put_hex(int val) {
-	 int i;
-	 for (i = 7; i >= 0; --i) {
-		 char c = (0xF & (val >> (i * 4)));
-		 uart1_put_char(c + (c < 10 ? '0' : ('A' - 10)));
-	}
-	 uart1_put_string("\n\r");
-}
-
 void null_process(void) {
 	while(1) {
 		k_release_processor();
@@ -75,7 +66,7 @@ void process_init() {
 
 	curProcess = NULL;
 	nullProcessNode = (ProcessNode*)s_requestion_memory_block();
-	init_pcb(&null_process, nullProcessNode, 3);
+	init_pcb(&null_process, nullProcessNode, 4);
 	
 	assign_processes();
 }
@@ -87,7 +78,7 @@ int set_process_priority(int process_ID, int priority) {
 		return -1;
 	}
 		
-	if (priority < 0 || priority > 2)
+	if (priority < 0 || priority > 3)
 		return -1;
 	
 	while(node != NULL) {
@@ -157,7 +148,7 @@ void init_pcb(void* process, ProcessNode* node, int priority) {
 
 // This is for user process
 int add_new_process(void* process) {
-	return add_new_prioritized_process(process, 2);
+	return add_new_prioritized_process(process, 3);
 }
 
 int add_new_prioritized_process(void* process, int priority) {
@@ -268,7 +259,7 @@ void unblock_process() {
 	if (!hasFreeMemory())
 		return;
 	
-	for (i = 0; i < 3; ++i) {
+	for (i = 0; i < PRIORITY_COUNT; ++i) {
 		node = poll_process(blockedQueues[i]);
 		if (node != NULL) {
 			node->pcb.m_state = RDY;

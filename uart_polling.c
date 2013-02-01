@@ -123,3 +123,12 @@ int uart_put_string(int n_uart, unsigned char *s)
   }
   return 0;
 }
+
+void uart1_put_hex(int val) {
+	 int i;
+	 for (i = 7; i >= 0; --i) {
+		 char c = (0xF & (val >> (i * 4)));
+		 uart1_put_char(c + (c < 10 ? '0' : ('A' - 10)));
+	}
+	 uart1_put_string("\n\r");
+}
