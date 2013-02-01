@@ -132,3 +132,21 @@ void uart1_put_hex(int val) {
 	}
 	 uart1_put_string("\n\r");
 }
+
+void uart1_put_int(int val) {
+	int i;
+	int temp;
+	int original;
+	if (val < 0) {
+		val = -val;
+		uart1_put_char('-');
+	}
+	original = val;
+	for (i = 1000000000; i > 0; i /= 10) {
+		if (i < original) {
+			temp = val / i;
+			uart1_put_char(temp + '0');
+		}
+		val %= i;
+	}
+}
