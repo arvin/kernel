@@ -85,10 +85,13 @@ int s_release_memory_block(void* memory_block){
 				if((uint32_t)memory_block == (uint32_t)temp + (uint32_t)sizeof(Node) ){
 					removeFromList(MemoryList, temp);
 					insertToList(FreeMemoryList, temp);
+					// Unblock any processes if possible
+					unblock_process();
 					return 0; //Success
 				}
 				temp = temp->next;
 		}
+		
 		return -1; //Error
 }
 

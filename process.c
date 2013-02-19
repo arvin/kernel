@@ -70,7 +70,8 @@ int set_process_priority(int process_ID, int priority) {
 }
 
 int get_process_priority(int process_ID) {
-		
+	
+	int i = 0;
 	ProcessNode* node = readyQueue->first;
 	
 	while(node != NULL) {
@@ -78,6 +79,17 @@ int get_process_priority(int process_ID) {
 			return node->pcb.priority;
 		}
 		node = node->next;
+	}
+	
+	for (i = 0; i < PRIORITY_COUNT; ++i) {
+		node = blockedQueues[i]->first;
+		
+		while(node != NULL) {
+			if (node->pcb.m_pid == process_ID) {
+				return node->pcb.priority;
+			}
+			node = node->next;
+		}
 	}
 
 	return -1;
@@ -191,6 +203,16 @@ void push_process(ProcessQueue* queue, ProcessNode* node) {
 	queue->size++;
 }
 
+// Add process to the back of the specified queue
+void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
+	if (queue->first == NULL) {		
+		queue->last = node;
+	}
+	node->next = queue->first;
+	queue->first = node;
+	queue->size++;
+}
+
 // Internal call for releasing processor
 int k_release_processor(void)
 {
@@ -199,8 +221,6 @@ int k_release_processor(void)
 	ProcessNode *oldProcess = NULL;
 	ProcessNode *newProcess = NULL;
 
-	// Unblock any processes if possible
-	unblock_process();
 	newProcess = scheduler();
 	if (curProcess == NULL) {
 	 return -1;
@@ -242,7 +262,13 @@ void unblock_process() {
 		node = poll_process(blockedQueues[i]);
 		if (node != NULL) {
 			node->pcb.m_state = RDY;
-			push_process(readyQueue, node);
+			push_process_to_front(readyQueue, node);
+			
+			//Preemption
+			if(curProcess->pcb.priority < node->pcb.priority) {
+				release_processor();
+			}
+			
 			return;
 		}
 	}
