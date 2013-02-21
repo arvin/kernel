@@ -45,7 +45,12 @@ void process_init() {
 	init_pcb(&null_process, nullProcessNode, 4);
 	
 	// User processes initialization
-	assign_processes();
+	for (i = 0; i < ProcessCount; ++i)
+		add_new_prioritized_process(ProcessTable[i], 0);
+}
+
+void* k_meh(int param) {
+	return (void*)param;
 }
 
 int set_process_priority(int process_ID, int priority) {
@@ -135,7 +140,7 @@ void init_pcb(void* process, ProcessNode* node, int priority) {
 }
 
 // This is an API call for creating new user processes
-int add_new_process(void* process) {
+int k_add_new_process(void* process) {
 	return add_new_prioritized_process(process, 3);
 }
 

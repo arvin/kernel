@@ -5,7 +5,6 @@
 
 extern void* Image$$RW_IRAM1$$ZI$$Limit;
 
-#define NULL 0
 #define MemoryStart &Image$$RW_IRAM1$$ZI$$Limit
 #define MemoryEnd 0x10007FFF
 

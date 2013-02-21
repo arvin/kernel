@@ -5,7 +5,7 @@
 #include "memory.h"
 #include "process.h"
 
-int main(){
+int main() {
 	SystemInit();
 	__disable_irq();
 	

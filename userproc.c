@@ -14,6 +14,7 @@ void proc1(void) {
 	uart1_put_string("-- RTX Test Start --\n\r");
 	uart1_put_string("Test 1: Deallocate non-existing blocks.\n\r");
 	
+	
 	if (s_release_memory_block(0)) {
 		passCount++;
 		uart1_put_string("PASSED\n\r");
@@ -161,12 +162,12 @@ void proc6(void) {
 	while (true);
 }
 
-
-void assign_processes() {
-  add_new_process(&proc1);
-	add_new_process(&proc2);
-	add_new_process(&proc3);
-	add_new_process(&proc4);
-	add_new_process(&proc5);
-	add_new_process(&proc6);
-}
+int ProcessCount = 6;
+void* ProcessTable[] = {
+	&proc1,
+	&proc2,
+	&proc3,
+	&proc4,
+	&proc5,
+	&proc6
+};
