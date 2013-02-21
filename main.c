@@ -20,7 +20,7 @@ int main() {
 	uart1_put_string("======================================\n\r\n\r");
 
 	__set_CONTROL(__get_CONTROL() | BIT(0));
-	manage_processor();
+	release_processor();
 	
 	return 0;
 }

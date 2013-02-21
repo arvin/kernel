@@ -18,7 +18,7 @@ int newProcessId = 0;				/* Must be unique */
 
 void null_process(void) {
 	while(1) {
-		k_release_processor();
+		release_processor();
 	}
 }
 
@@ -47,10 +47,6 @@ void process_init() {
 	// User processes initialization
 	for (i = 0; i < ProcessCount; ++i)
 		add_new_prioritized_process(ProcessTable[i], 0);
-}
-
-void* k_meh(int param) {
-	return (void*)param;
 }
 
 int k_set_process_priority(int process_ID, int priority) {
@@ -161,22 +157,23 @@ int add_new_prioritized_process(void* process, int priority) {
 }
 
 // This is an API call for relasing current user process
-int release_processor() {
-	return release_processor_to_queue(RDY);
+int k_voluntarily_release_processor() {
+	return k_release_processor(RDY);
 }
 
 // This is an internal API call for releasing current process with a new specified state
-int release_processor_to_queue(proc_state_t newState) {
+int k_release_processor(proc_state_t newState) {
 	curProcess->pcb.m_state = newState;
 	switch (newState) {
 		case RDY:
-			push_process(readyQueue, curProcess);
+			if (curProcess != NULL)
+				push_process(readyQueue, curProcess);
 			break;
 		case INSUFFICIENT_MEMORY:
 			push_process(blockedQueues[curProcess->pcb.priority], curProcess);
 			break;
 	}
-	manage_processor();
+	switch_process();
 	return 0;
 }
 
@@ -219,7 +216,7 @@ void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 }
 
 // Internal call for releasing processor
-int k_release_processor(void)
+int switch_process(void)
 {
 	volatile int i;
 	volatile proc_state_t state;
@@ -271,7 +268,7 @@ void unblock_process() {
 			
 			//Preemption
 			if(curProcess->pcb.priority < node->pcb.priority) {
-				release_processor();
+				k_voluntarily_release_processor();
 			}
 			
 			return;

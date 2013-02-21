@@ -45,15 +45,14 @@ void init_pcb(void* process, ProcessNode* node, int priority);
 ProcessNode* scheduler(void);               /* pick the pid of the next to run process */
 int k_add_new_process(void*);
 int add_new_prioritized_process(void*, int priority);
-int release_processor(void);				/* user release_process function */
-int k_release_processor(void);       /* kernel release_process function */
+int k_voluntarily_release_processor(void);				/* user release_process function */
+int switch_process(void);       /* kernel release_process function */
 int k_set_process_priority(int process_ID, int priority);
 int k_get_process_priority(int process_ID);
-int release_processor_to_queue(proc_state_t newState);
+int k_release_processor(proc_state_t newState);
 ProcessNode* poll_process(ProcessQueue* queue);
 void push_process(ProcessQueue* queue, ProcessNode* node);
 void unblock_process(void);
-void* k_meh(int param);
 extern void __rte(void);           /* pop exception stack frame */
 
 #endif /* ! _PROCESS_H_ */

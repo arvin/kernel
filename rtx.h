@@ -13,11 +13,9 @@ extern void* ProcessTable[];
 // User API
 #define __SVC_0  __svc_indirect(0)
 
-extern int k_release_processor(void);
-#define manage_processor() _release_processor((U32)k_release_processor)
+extern int k_voluntarily_release_processor(void);
+#define release_processor() _release_processor((U32)k_voluntarily_release_processor)
 int _release_processor(U32 p_func) __SVC_0;
-
-extern int release_processor(void);
 
 extern void* k_persistent_request_memory_block(void);
 #define request_memory_block() _request_memory_block((U32)k_persistent_request_memory_block)

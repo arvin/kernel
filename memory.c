@@ -99,7 +99,7 @@ void *k_persistent_request_memory_block() {
 	void* block = k_request_memory_block();
 	while (block == NULL) {
 		// Process will be blocked if there isn't any sufficient memory
-		release_processor_to_queue(INSUFFICIENT_MEMORY);
+		k_release_processor(INSUFFICIENT_MEMORY);
 		// Retry memory block request
 		block = k_request_memory_block();
 	}
