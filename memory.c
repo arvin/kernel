@@ -73,7 +73,7 @@ void removeFromList(LinkedList *list, Node* temp) {
 
 }
 
-int s_release_memory_block(void* memory_block){
+int k_release_memory_block(void* memory_block){
 		Node* temp;
 	
 		if(!memory_block){
@@ -95,10 +95,10 @@ int s_release_memory_block(void* memory_block){
 }
 
 // An API call for memory request
-void *s_requestion_memory_block() {
+void *k_persistent_request_memory_block() {
 	void* block = k_request_memory_block();
 	while (block == NULL) {
-		// Process will be released if there is no sufficient memory
+		// Process will be blocked if there isn't any sufficient memory
 		release_processor_to_queue(INSUFFICIENT_MEMORY);
 		// Retry memory block request
 		block = k_request_memory_block();

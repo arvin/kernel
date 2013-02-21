@@ -31,9 +31,9 @@ Node* getBlockFromFreeLinkedList(void);
 void insertToList(LinkedList *list, Node* currentNode);
 void removeFromList(LinkedList *list, Node* temp);
 
-int s_release_memory_block(void* memory_block);
+int k_release_memory_block(void* memory_block);
 
-void* s_requestion_memory_block(void);
+void* k_persistent_request_memory_block(void);
 void* k_request_memory_block(void);
 
 int hasFreeMemory(void);

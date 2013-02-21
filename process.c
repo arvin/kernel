@@ -25,15 +25,15 @@ void null_process(void) {
 void process_init() {
   int i;
 	// Ready queue initialization
-	readyQueue = (ProcessQueue*)s_requestion_memory_block();
+	readyQueue = (ProcessQueue*)k_request_memory_block();
 	readyQueue->first = NULL;
 	readyQueue->last = NULL;
 	readyQueue->size = 0;
 	
 	// Blocked queues initialization
-	blockedQueues = (ProcessQueue**)s_requestion_memory_block();
+	blockedQueues = (ProcessQueue**)k_request_memory_block();
 	for (i = 0; i < PRIORITY_COUNT; ++i) {
-		blockedQueues[i] = (ProcessQueue*)s_requestion_memory_block();
+		blockedQueues[i] = (ProcessQueue*)k_request_memory_block();
 		blockedQueues[i]->first = NULL;
 		blockedQueues[i]->last = NULL;
 		blockedQueues[i]->size = 0;
@@ -41,7 +41,7 @@ void process_init() {
 
 	// Null process initialization
 	curProcess = NULL;
-	nullProcessNode = (ProcessNode*)s_requestion_memory_block();
+	nullProcessNode = (ProcessNode*)k_request_memory_block();
 	init_pcb(&null_process, nullProcessNode, 4);
 	
 	// User processes initialization
@@ -115,7 +115,7 @@ ProcessNode* scheduler(void){
 
 void init_pcb(void* process, ProcessNode* node, int priority) {
 	int i;
-	uint32_t* stackBlockStart = (uint32_t*)s_requestion_memory_block();
+	uint32_t* stackBlockStart = (uint32_t*)k_request_memory_block();
 	node->next = NULL;
 	
 	// PCB initialization
@@ -146,7 +146,7 @@ int k_add_new_process(void* process) {
 
 // This is an internal call for creating new processes
 int add_new_prioritized_process(void* process, int priority) {
-	ProcessNode* node = (ProcessNode*)s_requestion_memory_block();
+	ProcessNode* node = (ProcessNode*)k_request_memory_block();
 	
 	
 	if (readyQueue->first == NULL)
