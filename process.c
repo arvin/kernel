@@ -53,7 +53,7 @@ void* k_meh(int param) {
 	return (void*)param;
 }
 
-int set_process_priority(int process_ID, int priority) {
+int k_set_process_priority(int process_ID, int priority) {
 	ProcessNode* node = readyQueue->first;
 
 	if(process_ID == 0){
@@ -74,7 +74,7 @@ int set_process_priority(int process_ID, int priority) {
 	return -1;
 }
 
-int get_process_priority(int process_ID) {
+int k_get_process_priority(int process_ID) {
 	
 	int i = 0;
 	ProcessNode* node = readyQueue->first;

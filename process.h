@@ -47,8 +47,8 @@ int k_add_new_process(void*);
 int add_new_prioritized_process(void*, int priority);
 int release_processor(void);				/* user release_process function */
 int k_release_processor(void);       /* kernel release_process function */
-int set_process_priority(int process_ID, int priority);
-int get_process_priority(int process_ID);
+int k_set_process_priority(int process_ID, int priority);
+int k_get_process_priority(int process_ID);
 int release_processor_to_queue(proc_state_t newState);
 ProcessNode* poll_process(ProcessQueue* queue);
 void push_process(ProcessQueue* queue, ProcessNode* node);
