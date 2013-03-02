@@ -10,8 +10,11 @@
 
 ProcessQueue* readyQueue;
 ProcessQueue** blockedQueues;
+ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
+
+pcb_t* procArr[6];
 
 int newProcessId = 0;				/* Must be unique */
 
@@ -38,7 +41,13 @@ void process_init() {
 		blockedQueues[i]->last = NULL;
 		blockedQueues[i]->size = 0;
 	}
-
+	
+	// Initialization of blocked queues for messaging
+	blockedMsgQueues = (ProcessQueue*)k_request_memory_block();
+	blockedMsgQueues->first = NULL;
+	blockedMsgQueues->last = NULL;
+	blockedMsgQueues->size = 0;
+	
 	// Null process initialization
 	curProcess = NULL;
 	nullProcessNode = (ProcessNode*)k_request_memory_block();
@@ -115,9 +124,15 @@ void init_pcb(void* process, ProcessNode* node, int priority) {
 	node->next = NULL;
 	
 	// PCB initialization
+	procArr[newProcessId] = &(node->pcb);
 	node->pcb.m_pid = newProcessId++;
+	
 	node->pcb.priority = priority;
 	node->pcb.m_state = NEW;
+	
+	node->pcb.msgQueue.first = NULL;
+	node->pcb.msgQueue.last = NULL;
+	node->pcb.msgQueue.size = 0;
 	
 	// Stack initialization
 	node->pcb.mp_sp = stackBlockStart + USR_SZ_STACK;
@@ -163,7 +178,9 @@ int k_voluntarily_release_processor() {
 
 // This is an internal API call for releasing current process with a new specified state
 int k_release_processor(proc_state_t newState) {
-	curProcess->pcb.m_state = newState;
+	if (curProcess != NULL)
+		curProcess->pcb.m_state = newState;
+	
 	switch (newState) {
 		case RDY:
 			if (curProcess != NULL)
@@ -171,6 +188,9 @@ int k_release_processor(proc_state_t newState) {
 			break;
 		case INSUFFICIENT_MEMORY:
 			push_process(blockedQueues[curProcess->pcb.priority], curProcess);
+			break;
+		case MSG_WAIT:
+			push_process(blockedMsgQueues, curProcess);
 			break;
 	}
 	switch_process();
@@ -190,6 +210,28 @@ ProcessNode* poll_process(ProcessQueue* queue) {
 	node->next = NULL;
 	queue->size--;
 	return node;
+}
+
+// Remove process from the specified queue with specified process ID
+ProcessNode* remove_process(ProcessQueue* queue, int pid) {
+	ProcessNode* node = queue->first;
+	ProcessNode* prev = NULL;
+	while (node != NULL) {
+		if (node->pcb.m_pid == pid) {
+			if (prev != NULL)
+				prev->next = node->next;
+			if (queue->first == node)
+				queue->first = node->next;
+			if (queue->last == node)
+				queue->last = prev;
+			
+			queue->size--;
+			return node;
+		}
+		prev = node;
+		node = node->next;
+	}
+	return NULL;
 }
 
 // Add process to the back of the specified queue
@@ -267,7 +309,7 @@ void unblock_process() {
 			push_process_to_front(readyQueue, node);
 			
 			//Preemption
-			if(curProcess->pcb.priority < node->pcb.priority) {
+			if(curProcess->pcb.priority > node->pcb.priority) {
 				k_voluntarily_release_processor();
 			}
 			
@@ -275,3 +317,28 @@ void unblock_process() {
 		}
 	}
 }
+
+int k_send_message(int process_ID, void *messageEnvelope) {
+	ProcessNode* node;
+	pcb_t* target = procArr[process_ID];
+	Message* msg = (Message*)messageEnvelope;
+	addMessage(&(target->msgQueue), msg);
+	
+	node = remove_process(blockedMsgQueues, process_ID);
+	if (node != NULL) {
+		// Receiver is in blocked queue
+		node->pcb.m_state = RDY;
+		push_process_to_front(readyQueue, node);
+		
+		//Preemption
+		if(curProcess->pcb.priority > node->pcb.priority) {
+			k_voluntarily_release_processor();
+		}
+	}
+	return 0;
+}
+
+void* k_receive_message(int* sender_id) {
+    return removeMessage(&(curProcess->pcb.msgQueue), *sender_id);
+}
+

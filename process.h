@@ -9,9 +9,10 @@
 
 #include <stdint.h>
 #include "memory.h"
+#include "message.h"
 
 /* process states, note we only assume three states in this example */
-typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY} proc_state_t;  
+typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT} proc_state_t;  
 
 /*
   PCB data structure definition.
@@ -27,6 +28,7 @@ typedef struct pcb {
   uint32_t m_pid;          /* process id */
   proc_state_t m_state;    /* state of the process */
 	int priority;
+	MessageQueue msgQueue;
 } pcb_t;
 
 typedef struct ProcessNode {
@@ -40,6 +42,7 @@ typedef struct ProcessQueue {
 	int size;
 } ProcessQueue;
 
+
 void process_init(void);    /* initialize all procs in the system */
 void init_pcb(void* process, ProcessNode* node, int priority);
 ProcessNode* scheduler(void);               /* pick the pid of the next to run process */
@@ -51,8 +54,12 @@ int k_set_process_priority(int process_ID, int priority);
 int k_get_process_priority(int process_ID);
 int k_release_processor(proc_state_t newState);
 ProcessNode* poll_process(ProcessQueue* queue);
+ProcessNode* remove_process(ProcessQueue* queue, int pid);
 void push_process(ProcessQueue* queue, ProcessNode* node);
 void unblock_process(void);
 extern void __rte(void);           /* pop exception stack frame */
+
+int k_send_message(int process_ID, void *messageEnvelope);
+void* k_receive_message(int* sender_id);
 
 #endif /* ! _PROCESS_H_ */

@@ -11,6 +11,14 @@ extern int ProcessCount;
 extern void* ProcessTable[];
 
 // User API
+
+typedef struct Message{
+    int sender_pid;
+	  int dest_pid;
+	  int type;
+	  void* data;
+}Message;
+
 #define __SVC_0  __svc_indirect(0)
 
 extern int k_voluntarily_release_processor(void);
@@ -32,5 +40,13 @@ int _set_process_priority(U32 p_func, int process_ID, int priority) __SVC_0;
 extern int k_get_process_priority(int process_ID);
 #define get_process_priority(process_ID) _get_process_priority((U32)k_get_process_priority, process_ID)
 int _get_process_priority(U32 p_func, int process_ID) __SVC_0;
+
+extern int k_send_message(int process_ID, void *messageEnvelope);
+#define send_message(process_ID, messageEnvelope) _send_message((U32)k_send_message, process_ID, messageEnvelope)
+int _send_message(U32 p_func, int process_ID, void *messageEnvelope) __SVC_0;
+
+extern void* k_receive_message(int* sender_id);
+#define receive_message(sender_id) _receive_message((U32)k_receive_message, sender_id)
+void* _receive_message(U32 p_func, int* sender_ID) __SVC_0;
 
 #endif /* !_RTX_H_ */
