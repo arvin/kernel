@@ -49,4 +49,12 @@ extern void* k_receive_message(int* sender_id);
 #define receive_message(sender_id) _receive_message((U32)k_receive_message, sender_id)
 void* _receive_message(U32 p_func, int* sender_ID) __SVC_0;
 
+extern int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
+#define delayed_send(process_ID, MessageEnvelope, delay) _delayed_send((U32)k_delayed_send, process_ID, MessageEnvelope, delay)
+int _delayed_send(U32 p_func, int process_ID, void* MessageEnvelope, int delay) __SVC_0;
+
+extern void k_dec_delay_msg_time(void);
+#define dec_delay_msg_time() _dec_delay_msg_time((U32)k_dec_delay_msg_time)
+int _dec_delay_msg_time(U32 p_func) __SVC_0;
+
 #endif /* !_RTX_H_ */

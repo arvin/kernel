@@ -12,6 +12,7 @@ int proc4Stage = 0;
 
 
 //Original, old process 1
+/*
 void proc1(void) {
 	uart1_put_string("-- RTX Test Start --\n\r");
 	uart1_put_string("Test 1: Deallocate non-existing blocks.\n\r");
@@ -28,8 +29,8 @@ void proc1(void) {
 		release_processor();
 	while (true);
 }
+*/
 
-/*
 //New process 1
 void proc1(void) {
 	Message* msg;
@@ -45,20 +46,21 @@ void proc1(void) {
 	else
 		uart1_put_string("FAILED\n\r");
 	
-	//msg = (Message*)receive_message(& sender_id);
+	msg = (Message*)receive_message(& sender_id);
 
-	//msgNum =  (msg->data);
-	//uart1_put_int(*msgNum);
-	//uart1_put_string("\n\r\n\r");
+	msgNum =  (msg->data);
+	uart1_put_int(*msgNum);
+	uart1_put_string("\n\r\n\r");
 	
 	
 	do
 		release_processor();
 	while (true);
 }
-*/
+
 
 //Old process 2
+/*
 void proc2(void){
 	uart1_put_string("Test 2: Release processor\n\r");
 	
@@ -66,15 +68,16 @@ void proc2(void){
 		release_processor();
 	while (true);
 }
+*/
 
 
-/*
+
 void proc2(void){
 	Message* new_Message;
 	int* message_data;
 	uart1_put_string("Test 2: Release processor\n\r");
 	
-	/*new_Message = (Message*) request_memory_block();
+	new_Message = (Message*) request_memory_block();
 	message_data = (int*)request_memory_block();
 	*message_data = 9999;
 	
@@ -83,14 +86,13 @@ void proc2(void){
 	new_Message->dest_pid = 1;
 	new_Message->type = 1;
 
-	//new_message
-	//send_message(1, (void*) new_Message);
+	send_message(1, (void*) new_Message);
 	
   do
 		release_processor();
 	while (true);
 }
-*/
+
 
 void proc3(void){
 	int i;

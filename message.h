@@ -6,7 +6,7 @@
 typedef struct MessageNode {
 	Message* message;
 	struct MessageNode* next;
-	struct MessageNode* prev;
+	int delay;
 } MessageNode;
 
 typedef struct MessageQueue {
@@ -15,8 +15,8 @@ typedef struct MessageQueue {
 	int size;
 } MessageQueue;
 
-void addMessage(MessageQueue* queue, Message* msg);
-Message* removeMessage(MessageQueue* queue, int sender_id);
-MessageNode* removeMessageFromQueue(MessageQueue* queue, int sender_id);
+void addMessage(MessageQueue* queue, Message* msg, int delay);
+Message* removeMessage(MessageQueue* queue, int* sender_id);
+MessageNode* pollMessageQueue(MessageQueue* queue);
 
 #endif

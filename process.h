@@ -60,6 +60,8 @@ void unblock_process(void);
 extern void __rte(void);           /* pop exception stack frame */
 
 int k_send_message(int process_ID, void *messageEnvelope);
+int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 void* k_receive_message(int* sender_id);
+void k_dec_delay_msg_time(void);
 
 #endif /* ! _PROCESS_H_ */

@@ -4,6 +4,7 @@
 #include "rtx.h"
 #include "memory.h"
 #include "process.h"
+#include "timer.h"
 
 int main() {
 	SystemInit();
@@ -12,6 +13,7 @@ int main() {
 	uart1_init();
 	memory_init();
 	process_init();
+	timer_init(0);
 	
 	__enable_irq();
 	

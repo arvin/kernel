@@ -14,8 +14,8 @@ ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
 
-pcb_t* procArr[6];
-
+pcb_t* procArr[7];
+MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
 
 
@@ -42,11 +42,19 @@ void process_init() {
 		blockedQueues[i]->size = 0;
 	}
 	
+	
+
 	// Initialization of blocked queues for messaging
 	blockedMsgQueues = (ProcessQueue*)k_request_memory_block();
 	blockedMsgQueues->first = NULL;
 	blockedMsgQueues->last = NULL;
 	blockedMsgQueues->size = 0;
+	
+	//Initialization of delayed message queue
+	msgDelayQueue = (MessageQueue*)k_request_memory_block();
+	msgDelayQueue->first = NULL;
+	msgDelayQueue->last = NULL;
+	msgDelayQueue->size = 0;
 	
 	// Null process initialization
 	curProcess = NULL;
@@ -291,7 +299,7 @@ int switch_process(void)
 		uart1_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
 		uart1_put_hex(curProcess->pcb.m_pid);
 		 return -1;
-	}	 	 
+	}
 	return 0;
 }
 
@@ -322,7 +330,7 @@ int k_send_message(int process_ID, void *messageEnvelope) {
 	ProcessNode* node;
 	pcb_t* target = procArr[process_ID];
 	Message* msg = (Message*)messageEnvelope;
-	addMessage(&(target->msgQueue), msg);
+	addMessage(&(target->msgQueue), msg, 0);
 	
 	node = remove_process(blockedMsgQueues, process_ID);
 	if (node != NULL) {
@@ -338,7 +346,52 @@ int k_send_message(int process_ID, void *messageEnvelope) {
 	return 0;
 }
 
-void* k_receive_message(int* sender_id) {
-    return removeMessage(&(curProcess->pcb.msgQueue), *sender_id);
+int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
+	Message* msg = (Message*)MessageEnvelope;
+	addMessage(msgDelayQueue, msg, delay);
+	return 0;
 }
 
+void* k_receive_message(int* sender_id) {
+    return removeMessage(&(curProcess->pcb.msgQueue), sender_id);
+}
+
+void k_dec_delay_msg_time(){
+	MessageNode* temp;
+	MessageNode* node = msgDelayQueue->first;
+	MessageNode* 	prev = msgDelayQueue->first;
+	Message* msg ;
+	while(node!=NULL)
+	{
+		node->delay--;
+		if(node->delay <=0){
+			msg = node->message;
+			k_send_message(msg->sender_pid, (void*)msg);
+			temp = node;
+			if((node == msgDelayQueue->first) || (node == msgDelayQueue->last)){
+				if(msgDelayQueue->first == msgDelayQueue->last){
+					msgDelayQueue->first = NULL;
+					msgDelayQueue->last = NULL;
+				}else{
+					if(node == msgDelayQueue->first){
+						msgDelayQueue->first = node->next;
+						prev = node->next;
+					}
+					if(node == msgDelayQueue->last){
+						msgDelayQueue->last = prev;
+						prev->next = NULL;
+					}
+				}
+			}
+			else{
+				prev->next = node->next;
+			}
+			node = node->next;
+			k_release_memory_block(temp);
+		}
+		else{
+			prev = node;
+			node = node->next;
+		}
+	}
+}
