@@ -3,7 +3,6 @@
 ### Creating ADS-LD Command Line
 ### List of Objects: adding '"startup_lpc17xx.o"'
 ### List of Objects: adding '"system_lpc17xx.o"'
-### List of Objects: adding '"uart_polling.o"'
 ### List of Objects: adding '"main.o"'
 ### List of Objects: adding '"process.o"'
 ### List of Objects: adding '"userproc.o"'
@@ -11,8 +10,9 @@
 ### List of Objects: adding '"memory.o"'
 ### List of Objects: adding '"message.o"'
 ### List of Objects: adding '"timer.o"'
+### List of Objects: adding '"uart_irq.o"'
 ### ADS-LD Command completed:
---cpu Cortex-M3 "startup_lpc17xx.o" "system_lpc17xx.o" "uart_polling.o" "main.o" "process.o" "userproc.o" "hal.o" "memory.o" "message.o" "timer.o" 
+--cpu Cortex-M3 "startup_lpc17xx.o" "system_lpc17xx.o" "main.o" "process.o" "userproc.o" "hal.o" "memory.o" "message.o" "timer.o" "uart_irq.o" 
 --strict --scatter "Lab1.sct" 
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
 --info sizes --info totals --info unused --info veneers 
@@ -20,7 +20,7 @@
 ### ADS-LD Output File: 'Lab1.axf'
 ### ADS-LD Command File: 'Lab1.lnp'
 ### Checking for dirty Components...
-### Creating CmdFile 'Lab1.lnp', Handle=0x0000054C
+### Creating CmdFile 'Lab1.lnp', Handle=0x00002324
 ### Writing '.lnp' file
 ### ADS-LD Command file 'Lab1.lnp' is ready.
 ### ADS-LD: About to start ADS-LD Thread.

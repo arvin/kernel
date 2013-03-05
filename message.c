@@ -24,6 +24,7 @@ MessageNode* pollMessageQueue(MessageQueue* queue) {
 	node = queue->first;
 	
 	if (node == NULL) {
+		__enable_irq();
 		return NULL;
 	}
 	queue->first = node->next;

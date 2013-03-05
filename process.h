@@ -1,7 +1,7 @@
 #ifndef _PROCESS_H_
 #define _PROCESS_H_
 
-#define USR_SZ_STACK 0x020
+#define USR_SZ_STACK 0x030
 
 #define NULL 0
 #define PRIORITY_COUNT 4
@@ -63,5 +63,6 @@ int k_send_message(int process_ID, void *messageEnvelope);
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 void* k_receive_message(int* sender_id);
 void k_dec_delay_msg_time(void);
+int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
 
 #endif /* ! _PROCESS_H_ */

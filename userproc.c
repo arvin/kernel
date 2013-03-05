@@ -1,5 +1,5 @@
 #include "rtx.h"
-#include "uart_polling.h"
+#include "uart.h"
 #include "userproc.h"
 #ifdef DEBUG_0
 #include <stdio.h>
@@ -14,16 +14,16 @@ int proc4Stage = 0;
 //Original, old process 1
 /*
 void proc1(void) {
-	uart1_put_string("-- RTX Test Start --\n\r");
-	uart1_put_string("Test 1: Deallocate non-existing blocks.\n\r");
+	uart_put_string("-- RTX Test Start --\n\r");
+	uart_put_string("Test 1: Deallocate non-existing blocks.\n\r");
 	
 	
 	if (release_memory_block(0)) {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	else
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	
 	do
 		release_processor();
@@ -33,24 +33,25 @@ void proc1(void) {
 
 //New process 1
 void proc1(void) {
+	
 	Message* msg;
 	int sender_id = 2;
 	int* msgNum;
-	uart1_put_string("-- RTX Test Start --\n\r");
-	uart1_put_string("Test 1: Deallocate non-existing blocks.\n\r");
+	uart_put_string("-- RTX Test Start --\n\r");
+	uart_put_string("Test 1: Deallocate non-existing blocks.\n\r");
 
 	if (release_memory_block(0)) {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	else
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	
 	msg = (Message*)receive_message(& sender_id);
 
 	msgNum =  (msg->data);
-	uart1_put_int(*msgNum);
-	uart1_put_string("\n\r\n\r");
+	uart_put_int(*msgNum);
+	uart_put_string("\n\r\n\r");
 	
 	
 	do
@@ -62,7 +63,7 @@ void proc1(void) {
 //Old process 2
 /*
 void proc2(void){
-	uart1_put_string("Test 2: Release processor\n\r");
+	uart_put_string("Test 2: Release processor\n\r");
 	
   do
 		release_processor();
@@ -75,7 +76,7 @@ void proc2(void){
 void proc2(void){
 	Message* new_Message;
 	int* message_data;
-	uart1_put_string("Test 2: Release processor\n\r");
+	uart_put_string("Test 2: Release processor\n\r");
 	
 	new_Message = (Message*) request_memory_block();
 	message_data = (int*)request_memory_block();
@@ -86,8 +87,8 @@ void proc2(void){
 	new_Message->dest_pid = 1;
 	new_Message->type = 1;
 
-	send_message(1, (void*) new_Message);
-	
+//	send_message(1, (void*) new_Message);
+	delayed_send(1, (void*) new_Message, 5);
   do
 		release_processor();
 	while (true);
@@ -99,19 +100,19 @@ void proc3(void){
 	int errorFlag = 0;
 	
 	passCount++;
-	uart1_put_string("PASSED\n\r");
+	uart_put_string("PASSED\n\r");
 	
-	uart1_put_string("Test 3: Allocate and deallocate memory 50 times.\n\r");
+	uart_put_string("Test 3: Allocate and deallocate memory 50 times.\n\r");
 	
 	for(i = 0; i < 50; i++){
 		errorFlag |= release_memory_block(request_memory_block());
 	}
 	
 	if (errorFlag)
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	else {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	
 	do
@@ -126,7 +127,7 @@ void proc4(void){
 	int i = 0;
 	int errorFlag = 0;
 	
-	uart1_put_string("Test 4 (Step 1): Allocate 95 blocks.\n\r");
+	uart_put_string("Test 4 (Step 1): Allocate 95 blocks.\n\r");
 	for (i = 0; i < 3; ++i)
 		arr[i] = request_memory_block();
 	
@@ -139,7 +140,7 @@ void proc4(void){
 	proc4Stage++;
 	release_processor();
 	
-	uart1_put_string("Test 4 (Step 2): Deallocate 95 blocks.\n\r");
+	uart_put_string("Test 4 (Step 2): Deallocate 95 blocks.\n\r");
 	i--;
 	
 	while(i >= 0) {
@@ -150,10 +151,10 @@ void proc4(void){
 		errorFlag |= release_memory_block(arr[i]);
 	
 	if (errorFlag)
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	else {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	
 	proc4Stage++;
@@ -166,13 +167,13 @@ void proc5(void) {
 	void* block;
 	block = request_memory_block();
 	release_memory_block(block);
-	uart1_put_string("Test 5: Request for memory block while all memory blocks are used.\n\r");
+	uart_put_string("Test 5: Request for memory block while all memory blocks are used.\n\r");
 	if (proc4Stage == 2) {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	else
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	
 	do
 		release_processor();
@@ -185,37 +186,37 @@ void proc6(void) {
 	release_processor();
 	
 	result = set_process_priority(1, 2);
-	uart1_put_string("Test 6a: Set priority to a valid number.\n\r");
+	uart_put_string("Test 6a: Set priority to a valid number.\n\r");
 	if(result == 0) {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	else
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	
 	result = set_process_priority(1, 9000);
 	
-	uart1_put_string("Test 6b: Set priority to an invalid number.\n\r");
+	uart_put_string("Test 6b: Set priority to an invalid number.\n\r");
 	if(result == -1) {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	else
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	
-	uart1_put_string("Test 6c: Setting priority of null process should be prohibited.\n\r");
+	uart_put_string("Test 6c: Setting priority of null process should be prohibited.\n\r");
 	set_process_priority(0, 1);
 	if(result == -1) {
 		passCount++;
-		uart1_put_string("PASSED\n\r");
+		uart_put_string("PASSED\n\r");
 	}
 	else
-		uart1_put_string("FAILED\n\r");
+		uart_put_string("FAILED\n\r");
 	
-	uart1_put_string("Total number of pass count:\n\r");
-	uart1_put_int(passCount);
-	uart1_put_string(" out of 8 passed in total.\n\r");
-	uart1_put_string("-- RTX Test End --\n\r");
+	uart_put_string("Total number of pass count:\n\r");
+	uart_put_int(passCount);
+	uart_put_string(" out of 8 passed in total.\n\r");
+	uart_put_string("-- RTX Test End --\n\r");
 	do
 		release_processor();
 	while (true);

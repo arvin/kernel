@@ -1,7 +1,7 @@
 #include <LPC17xx.h>
 #include "memory.h"
 #include "process.h"
-#include "uart_polling.h"
+#include "uart.h"
 
 extern void* Image$$RW_IRAM1$$ZI$$Limit;
 
@@ -27,7 +27,7 @@ void memory_init() {
 
 void setNewStartingAddress() {
 	// Notice that total size of a block is 128 bytes plus the size of a node structure
-	MemoryList->newStartingAddress = MemoryList->newStartingAddress + 32 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node);
+	MemoryList->newStartingAddress = MemoryList->newStartingAddress + 48 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node);
 }
 
 Node* getBlockFromFreeLinkedList() {
@@ -75,8 +75,9 @@ void removeFromList(LinkedList *list, Node* temp) {
 
 int k_release_memory_block(void* memory_block){
 		Node* temp;
-	
+		__disable_irq();
 		if(!memory_block){
+			__enable_irq();
 			return -1; //Error
 		}
 		temp = MemoryList->first;
@@ -86,11 +87,12 @@ int k_release_memory_block(void* memory_block){
 					insertToList(FreeMemoryList, temp);
 					// Unblock any processes if possible
 					unblock_process();
+					__enable_irq();
 					return 0; //Success
 				}
 				temp = temp->next;
 		}
-		
+		__enable_irq();
 		return -1; //Error
 }
 
@@ -108,9 +110,10 @@ void *k_persistent_request_memory_block() {
 
 // An internal API call for memory request
 void* k_request_memory_block() {
+
 	Node* currentNode;
 	uint32_t block;
-	
+	__disable_irq();
 	// Check if any memory has been freed
 	if(FreeMemoryList->first != NULL) {
 		currentNode = getBlockFromFreeLinkedList();
@@ -119,6 +122,7 @@ void* k_request_memory_block() {
 	//search for memory block in pool
 	else if (hasUnusedMemory()){
 		// No more memory
+			__enable_irq();
 		return NULL;
 	}
 	else {
@@ -128,7 +132,7 @@ void* k_request_memory_block() {
 		setNewStartingAddress();
 	}
 	insertToList(MemoryList, currentNode);
-	
+	__enable_irq();
 	return (void*)block;
 }
 

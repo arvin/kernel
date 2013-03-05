@@ -1,5 +1,5 @@
 #include <LPC17xx.h>
-#include "uart_polling.h"
+#include "uart.h"
 #include "process.h"
 #include "userproc.h"
 #include "rtx.h"
@@ -296,8 +296,8 @@ int switch_process(void)
 		__set_MSP((uint32_t) curProcess->pcb.mp_sp); /* switch to the new proc's stack */		
 	} else {
 		curProcess = oldProcess; /* revert back to the old proc on error */
-		uart1_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
-		uart1_put_hex(curProcess->pcb.m_pid);
+		uart_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
+//		uart1_put_hex(curProcess->pcb.m_pid);
 		 return -1;
 	}
 	return 0;
@@ -327,6 +327,10 @@ void unblock_process() {
 }
 
 int k_send_message(int process_ID, void *messageEnvelope) {
+	return send_msg(process_ID, messageEnvelope, 1);
+}
+
+int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
 	ProcessNode* node;
 	pcb_t* target = procArr[process_ID];
 	Message* msg = (Message*)messageEnvelope;
@@ -339,12 +343,13 @@ int k_send_message(int process_ID, void *messageEnvelope) {
 		push_process_to_front(readyQueue, node);
 		
 		//Preemption
-		if(curProcess->pcb.priority > node->pcb.priority) {
+		if(allowPreempt && curProcess->pcb.priority > node->pcb.priority) {
 			k_voluntarily_release_processor();
 		}
 	}
 	return 0;
 }
+
 
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
 	Message* msg = (Message*)MessageEnvelope;
@@ -361,12 +366,12 @@ void k_dec_delay_msg_time(){
 	MessageNode* node = msgDelayQueue->first;
 	MessageNode* 	prev = msgDelayQueue->first;
 	Message* msg ;
-	while(node!=NULL)
-	{
+
+	while(node!=NULL){
 		node->delay--;
 		if(node->delay <=0){
 			msg = node->message;
-			k_send_message(msg->sender_pid, (void*)msg);
+			send_msg(msg->dest_pid, (void*)msg, 0);
 			temp = node;
 			if((node == msgDelayQueue->first) || (node == msgDelayQueue->last)){
 				if(msgDelayQueue->first == msgDelayQueue->last){
@@ -387,6 +392,7 @@ void k_dec_delay_msg_time(){
 				prev->next = node->next;
 			}
 			node = node->next;
+			msgDelayQueue->size--;
 			k_release_memory_block(temp);
 		}
 		else{

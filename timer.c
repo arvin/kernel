@@ -9,8 +9,7 @@
 #include <LPC17xx.h>
 #include "timer.h"
 #include "process.h"
-
-#define BIT(X) (1<<X)
+#include "uart.h"
 
 volatile uint32_t g_timer_count = 0; // increment every 1 ms
 
@@ -114,8 +113,7 @@ void c_TIMER0_IRQHandler(void)
 {
 	/* ack inttrupt, see section  21.6.1 on pg 493 of LPC17XX_UM */
 	LPC_TIM0->IR = BIT(0);  
-	
-	dec_delay_msg_time();
+	k_dec_delay_msg_time();
 	g_timer_count++ ;
 }
 
