@@ -27,6 +27,22 @@ void null_process(void) {
 	}
 }
 
+void keyboard_proc(void){
+    Message *msg;
+	  int sender_id = 9;
+	  char buffer[200];
+	  char curChar;
+	  int index = 0;
+	  while(1){
+			msg = (Message *) k_receive_message(&sender_id);
+			while(curChar != '\n'){
+			    curChar = 'a';
+				  buffer[index++] = curChar;
+			}
+			k_send_message(sender_id, msg);
+		}
+}
+
 void process_init() {
   int i;
 	// Ready queue initialization
