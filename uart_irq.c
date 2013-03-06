@@ -1,5 +1,6 @@
 #include <LPC17xx.h>
 #include "uart.h"
+#include "atomic.h"
 
 volatile uint8_t g_UART0_TX_empty=1;
 volatile uint8_t g_UART0_buffer[BUFSIZE];
@@ -219,7 +220,7 @@ void uart_send_string( uint32_t n_uart, uint8_t *p_buffer, uint32_t len )
 	return;
 }
 
-int uart_put_string(unsigned char *s)
+int k_uart_put_string(unsigned char *s)
 {
   while (*s !=0) {              /* loop through each char in the string */
 		while ( !(g_UART0_TX_empty & 0x01) );	
@@ -237,11 +238,12 @@ int uart_put_char(int n_uart, unsigned char c)
 	if(n_uart == 0 ) { /* UART0 is implemented */
 		pUart = (LPC_UART_TypeDef *)LPC_UART0;
 	} else { /* other UARTs are not implemented */
+		atomic(1);
 		return -1;
 	}
 	
 	pUart->THR = c;
-	__enable_irq();
+	atomic(1);
 	return 0;
 }
 
@@ -252,10 +254,10 @@ void uart_put_hex(int val) {
 		 char c = (0xF & (val >> (i * 4)));
 		 uart_put_char(0, c + (c < 10 ? '0' : ('A' - 10)));
 	}
-		uart_put_string("\n\r");
+		k_uart_put_string("\n\r");
 	}
 
-void uart_put_int(int val) {
+void k_uart_put_int(int val) {
 	int i;
 	int temp;
 	int original;

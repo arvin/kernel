@@ -219,11 +219,13 @@ int k_release_processor(proc_state_t newState) {
 			push_process(blockedMsgQueues, curProcess);
 			break;
 		case INTERRUPT_TIMER:
-			push_process_to_front(interruptedProcessStack, curProcess);
+			if (curProcess != NULL)
+				push_process_to_front(interruptedProcessStack, curProcess);
 			nextProcessType = TIMER;
 			break;
 		case INTERRUPT_UART:
-			push_process_to_front(interruptedProcessStack, curProcess);
+			if (curProcess != NULL)
+				push_process_to_front(interruptedProcessStack, curProcess);
 			nextProcessType = UART;
 			break;
 	}
@@ -322,7 +324,7 @@ int switch_process(process_type nextProcessType)
 		__set_MSP((uint32_t) curProcess->pcb.mp_sp); /* switch to the new proc's stack */		
 	} else {
 		curProcess = oldProcess; /* revert back to the old proc on error */
-		uart_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
+		k_uart_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
 //		uart1_put_hex(curProcess->pcb.m_pid);
 		 return -1;
 	}

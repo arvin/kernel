@@ -4,7 +4,7 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 C:\Users\Sarah2\Documents\School\3A\SE 350\SE350-Lab0\Lab1.uvproj
-Project File Date:  03/05/2013
+Project File Date:  03/06/2013
 
 <h2>Output:</h2>
 Build target 'HelloWorld SIM'
@@ -18,203 +18,405 @@ compiling memory.c...
 compiling message.c...
 compiling timer.c...
 compiling uart_irq.c...
-linking...
-Program Size: Code=5072 RO-data=376 RW-data=88 ZI-data=728  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-compiling process.c...
-process.c(132): error:  #120: return value type does not match the function type
-process.c(134): error:  #120: return value type does not match the function type
-process.c(215): warning:  #223-D: function "push_process_to_front" declared implicitly
-process.c(278): error:  #159: declaration is incompatible with previous "push_process_to_front" (declared at line 215)
-process.c(427): error:  #20: identifier "g_timer_count" is undefined
-compiling memory.c...
-compiling message.c...
-compiling timer.c...
-Target not created
-Build target 'HelloWorld SIM'
-compiling process.c...
-process.c(216): warning:  #223-D: function "push_process_to_front" declared implicitly
-process.c(279): error:  #159: declaration is incompatible with previous "push_process_to_front" (declared at line 216)
-process.c(428): error:  #20: identifier "g_timer_count" is undefined
-Target not created
-Build target 'HelloWorld SIM'
-compiling main.c...
-compiling process.c...
-process.c(428): error:  #20: identifier "g_timer_count" is undefined
-compiling memory.c...
-compiling message.c...
-compiling timer.c...
-Target not created
-Build target 'HelloWorld SIM'
-compiling process.c...
-linking...
-Lab1.axf: Error: L6200E: Symbol g_timer_count multiply defined (by timer.o and process.o).
-Target not created
-Build target 'HelloWorld SIM'
-compiling timer.c...
-timer.c(81): error:  #20: identifier "g_timer_count" is undefined
-Target not created
-Build target 'HelloWorld SIM'
-compiling timer.c...
-linking...
-Program Size: Code=5184 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling process.c...
-process.c(77): error:  #20: identifier "timer_i_process" is undefined
-compiling timer.c...
-Target not created
-Build target 'HelloWorld SIM'
-compiling main.c...
-compiling process.c...
-compiling memory.c...
-compiling message.c...
-compiling timer.c...
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Rebuild target 'HelloWorld SIM'
-assembling startup_LPC17xx.s...
-compiling system_LPC17xx.c...
-compiling main.c...
-compiling process.c...
-compiling userproc.c...
-compiling HAL.c...
-compiling memory.c...
-compiling message.c...
-compiling timer.c...
-compiling uart_irq.c...
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-main.c(25): warning:  #223-D: function "_enable_irq" declared implicitly
-compiling timer.c...
-linking...
-Lab1.axf: Error: L6218E: Undefined symbol _enable_irq (referred from main.o).
-Target not created
-Build target 'HelloWorld SIM'
-compiling main.c...
-main.c(25): warning:  #223-D: function "_enable_irq" declared implicitly
-linking...
-Lab1.axf: Error: L6218E: Undefined symbol _enable_irq (referred from main.o).
-Target not created
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5176 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-compiling timer.c...
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-linking...
-Program Size: Code=5220 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5240 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-atomic.h(6): warning:  #1-D: last line of file ends without a newline
-compiling atomic.c...
-atomic.c(12): warning:  #1-D: last line of file ends without a newline
-linking...
-Program Size: Code=5260 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 2 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-compiling atomic.c...
-linking...
-Program Size: Code=5260 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling memory.c...
-compiling message.c...
-message.c(6): warning:  #223-D: function "atomic" declared implicitly
-message.c(23): warning:  #223-D: function "atomic" declared implicitly
-compiling uart_irq.c...
 uart_irq.c(236): warning:  #223-D: function "atomic" declared implicitly
 compiling atomic.c...
 linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Program Size: Code=5296 RO-data=376 RW-data=100 ZI-data=724  
+"Lab1.axf" - 0 Error(s), 1 Warning(s).
 Build target 'HelloWorld SIM'
-compiling message.c...
+compiling process.c...
 linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
+Program Size: Code=5308 RO-data=376 RW-data=100 ZI-data=724  
 "Lab1.axf" - 0 Error(s), 0 Warning(s).
 Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(236): warning:  #223-D: function "atomic" declared implicitly
+linking...
+Program Size: Code=5312 RO-data=376 RW-data=100 ZI-data=724  
+"Lab1.axf" - 0 Error(s), 1 Warning(s).
+Build target 'HelloWorld SIM'
 compiling main.c...
-main.c(29): error:  #65: expected a ";"
+main.c(18): error:  #167: argument of type "U32" is incompatible with parameter of type "unsigned char *"
+main.c(19): error:  #167: argument of type "U32" is incompatible with parameter of type "unsigned char *"
+main.c(20): error:  #167: argument of type "U32" is incompatible with parameter of type "unsigned char *"
+compiling process.c...
+process.c(327): error:  #167: argument of type "U32" is incompatible with parameter of type "unsigned char *"
+process.c: Error: Failed to switch process.\n\rProcess ID:\n\r");
 Target not created
 Build target 'HelloWorld SIM'
 compiling main.c...
+main.c(18): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling process.c...
+process.c(327): warning:  #223-D: function "uart_put_string" declared implicitly
+process.c: Error: Failed to switch process.\n\rProcess ID:\n\r");
+Target not created
+Build target 'HelloWorld SIM'
+compiling process.c...
+compiling userproc.c...
+userproc.c(40): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(79): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(103): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(130): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(170): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(189): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling memory.c...
+compiling message.c...
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(236): warning:  #223-D: function "atomic" declared implicitly
+uart_irq.c(255): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling atomic.c...
 linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
+Lab1.axf: Error: L6218E: Undefined symbol uart_put_string (referred from main.o).
+Target not created
 Build target 'HelloWorld SIM'
 compiling main.c...
-linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
+main.c(18): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling process.c...
+compiling userproc.c...
+userproc.c(40): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(79): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(103): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(130): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(170): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(189): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling memory.c...
+compiling message.c...
 compiling timer.c...
 linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
+Lab1.axf: Error: L6218E: Undefined symbol uart_put_string (referred from main.o).
+Target not created
 Build target 'HelloWorld SIM'
+compiling main.c...
+main.c(18): error:  #140: too many arguments in function call
+main.c(19): error:  #140: too many arguments in function call
+main.c(20): error:  #140: too many arguments in function call
+compiling process.c...
+compiling userproc.c...
+userproc.c(40): error:  #140: too many arguments in function call
+userproc.c(41): error:  #140: too many arguments in function call
+userproc.c(45): error:  #140: too many arguments in function call
+userproc.c(48): error:  #140: too many arguments in function call
+userproc.c(54): error:  #140: too many arguments in function call
+userproc.c(79): error:  #140: too many arguments in function call
+userproc.c(103): error:  #140: too many arguments in function call
+userproc.c(105): error:  #140: too many arguments in function call
+userproc.c(112): error:  #140: too many arguments in function call
+userproc.c(115): error:  #140: too many arguments in function call
+userproc.c(130): error:  #140: too many arguments in function call
+userproc.c(143): error:  #140: too many arguments in function call
+userproc.c(154): error:  #140: too many arguments in function call
+userproc.c(157): error:  #140: too many arguments in function call
+userproc.c(170): error:  #140: too many arguments in function call
+userproc.c(173): error:  #140: too many arguments in function call
+userproc.c(176): error:  #140: too many arguments in function call
+userproc.c(189): error:  #140: too many arguments in function call
+userproc.c(192): error:  #140: too many arguments in function call
+userproc.c(195): error:  #140: too many arguments in function call
+userproc.c(199): error:  #140: too many arguments in function call
+userproc.c(202): error:  #140: too many arguments in function call
+userproc.c(205): error:  #140: too many arguments in function call
+userproc.c(207): error:  #140: too many arguments in function call
+userproc.c(211): error:  #140: too many arguments in function call
+userproc.c(214): error:  #140: too many arguments in function call
+userproc.c(216): error:  #140: too many arguments in function call
+userproc.c(218): error:  #140: too many arguments in function call
+userproc.c(219): error:  #140: too many arguments in function call
+compiling memory.c...
+compiling message.c...
+compiling timer.c...
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+main.c(18): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(19): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(20): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling process.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling userproc.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+userproc.c(40): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(41): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(45): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(48): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(54): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(79): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(103): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(105): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(112): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(115): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(130): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(143): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(154): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(157): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(170): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(173): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(176): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(189): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(192): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(195): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(199): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(202): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(205): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(207): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(211): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(214): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(216): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling memory.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling message.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling timer.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+main.c(18): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(19): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(20): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling process.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling userproc.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+userproc.c(40): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(41): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(45): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(48): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(54): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(79): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(103): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(105): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(112): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(115): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(130): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(143): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(154): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(157): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(170): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(173): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(176): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(189): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(192): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(195): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(199): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(202): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(205): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(207): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(211): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(214): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(216): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling memory.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling message.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling timer.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+main.c(18): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(19): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(20): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling process.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling userproc.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+userproc.c(40): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(41): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(45): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(48): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(54): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(79): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(103): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(105): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(112): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(115): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(130): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(143): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(154): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(157): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(170): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(173): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(176): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(189): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(192): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(195): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(199): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(202): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(205): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(207): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(211): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(214): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(216): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling memory.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling message.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling timer.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+main.c(18): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling process.c...
+compiling userproc.c...
+userproc.c(40): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(79): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(103): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(130): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(170): warning:  #223-D: function "uart_put_string" declared implicitly
+userproc.c(189): warning:  #223-D: function "uart_put_string" declared implicitly
+compiling memory.c...
+compiling message.c...
+compiling timer.c...
 linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
+Lab1.axf: Error: L6218E: Undefined symbol uart_put_string (referred from main.o).
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+main.c(18): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(19): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+main.c(20): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling process.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling userproc.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+userproc.c(40): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(41): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(45): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(48): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(54): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(79): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(103): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(105): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(112): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(115): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(130): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(143): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(154): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(157): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(170): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(173): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(176): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(189): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(192): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(195): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(199): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(202): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(205): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(207): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(211): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(214): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+userproc.c(216): error:  #167: argument of type "char *" is incompatible with parameter of type "U32"
+compiling memory.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling message.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+compiling timer.c...
+rtx.h(62): error:  #55-D: too many arguments in invocation of macro "uart_put_string"
+rtx.h(62): error:  #79: expected a type specifier
+rtx.h(62): error:  #1504: first argument for __svc_indirect function must have integral type
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+compiling process.c...
+compiling userproc.c...
+compiling memory.c...
+compiling message.c...
+compiling timer.c...
+linking...
+Lab1.axf: Error: L6218E: Undefined symbol uart_put_string (referred from uart_irq.o).
+Target not created
+Build target 'HelloWorld SIM'
+compiling main.c...
+compiling process.c...
+compiling userproc.c...
+compiling memory.c...
+compiling message.c...
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(236): warning:  #223-D: function "atomic" declared implicitly
+linking...
+Program Size: Code=5380 RO-data=376 RW-data=100 ZI-data=724  
+"Lab1.axf" - 0 Error(s), 1 Warning(s).
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+linking...
+Program Size: Code=5388 RO-data=376 RW-data=100 ZI-data=724  
 "Lab1.axf" - 0 Error(s), 0 Warning(s).
 Build target 'HelloWorld SIM'
 compiling main.c...
-linking...
-Program Size: Code=5320 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
+compiling process.c...
+compiling userproc.c...
+uart.h(63): error:  #79: expected a type specifier
+uart.h(63): error:  #147-D: declaration is incompatible with "void _uart_put_int(U32, int)__svc(2147483648)" (declared at line 66 of "rtx.h")
+compiling memory.c...
+uart.h(63): error:  #79: expected a type specifier
+uart.h(63): error:  #147-D: declaration is incompatible with "void _uart_put_int(U32, int)__svc(2147483648)" (declared at line 66 of "rtx.h")
+compiling message.c...
+compiling timer.c...
+uart.h(63): error:  #79: expected a type specifier
+uart.h(63): error:  #147-D: declaration is incompatible with "void _uart_put_int(U32, int)__svc(2147483648)" (declared at line 66 of "rtx.h")
+Target not created
 Build target 'HelloWorld SIM'
 compiling main.c...
+compiling process.c...
+compiling userproc.c...
+compiling memory.c...
+compiling timer.c...
+compiling uart_irq.c...
 linking...
-Program Size: Code=5332 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5304 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5296 RO-data=376 RW-data=100 ZI-data=724  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Build target 'HelloWorld SIM'
-compiling main.c...
-linking...
-Program Size: Code=5320 RO-data=376 RW-data=100 ZI-data=724  
+Program Size: Code=5392 RO-data=376 RW-data=100 ZI-data=724  
 "Lab1.axf" - 0 Error(s), 0 Warning(s).
 Clean started: Project: 'Lab1'
    deleting intermediate output files for target 'HelloWorld SIM'
