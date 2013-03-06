@@ -196,7 +196,7 @@ int add_new_prioritized_process(void* process, int priority) {
 	return 0;
 }
 
-// This is an API call for relasing current user process
+// This is an API call for releasing current user process
 int k_voluntarily_release_processor() {
 	return k_release_processor(RDY);
 }
