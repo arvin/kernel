@@ -1,9 +1,10 @@
 #include "message.h"
 #include "process.h"
+#include "atomic.h"
 
 void addMessage(MessageQueue* queue, Message* msg, int delay){
 	MessageNode* node = (MessageNode*)k_request_memory_block();
-	__disable_irq();
+	atomic(0);
 	node->message = msg;
 	node->delay = delay;
 	if (queue->first == NULL) {
@@ -20,7 +21,7 @@ void addMessage(MessageQueue* queue, Message* msg, int delay){
 
 MessageNode* pollMessageQueue(MessageQueue* queue) {
 	MessageNode* node;
-	__disable_irq();
+	atomic(0);
 	node = queue->first;
 	
 	if (node == NULL) {

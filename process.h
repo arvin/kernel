@@ -12,7 +12,8 @@
 #include "message.h"
 
 /* process states, note we only assume three states in this example */
-typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT} proc_state_t;  
+typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, INTERRUPT_TIMER, INTERRUPT_UART} proc_state_t;  
+typedef enum{TIMER = 0, UART, REGULAR} process_type;
 
 /*
   PCB data structure definition.
@@ -45,17 +46,18 @@ typedef struct ProcessQueue {
 
 void process_init(void);    /* initialize all procs in the system */
 void init_pcb(void* process, ProcessNode* node, int priority);
-ProcessNode* scheduler(void);               /* pick the pid of the next to run process */
+ProcessNode* scheduler(process_type nextProcessType);               /* pick the pid of the next to run process */
 int k_add_new_process(void*);
 int add_new_prioritized_process(void*, int priority);
 int k_voluntarily_release_processor(void);				/* user release_process function */
-int switch_process(void);       /* kernel release_process function */
+int switch_process(process_type nextProcessType);       /* kernel release_process function */
 int k_set_process_priority(int process_ID, int priority);
 int k_get_process_priority(int process_ID);
 int k_release_processor(proc_state_t newState);
 ProcessNode* poll_process(ProcessQueue* queue);
 ProcessNode* remove_process(ProcessQueue* queue, int pid);
 void push_process(ProcessQueue* queue, ProcessNode* node);
+void push_process_to_front(ProcessQueue* queue, ProcessNode* node);
 void unblock_process(void);
 extern void __rte(void);           /* pop exception stack frame */
 
@@ -64,5 +66,6 @@ int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 void* k_receive_message(int* sender_id);
 void k_dec_delay_msg_time(void);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
+void timer_i_process(void);
 
 #endif /* ! _PROCESS_H_ */

@@ -13,11 +13,13 @@ ProcessQueue** blockedQueues;
 ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
+ProcessQueue* interruptedProcessStack;
 
 pcb_t* procArr[7];
+ProcessNode* iProcArr[2];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
-
+int g_timer_count = 0;
 
 void null_process(void) {
 	while(1) {
@@ -41,14 +43,18 @@ void process_init() {
 		blockedQueues[i]->last = NULL;
 		blockedQueues[i]->size = 0;
 	}
-	
-	
 
 	// Initialization of blocked queues for messaging
 	blockedMsgQueues = (ProcessQueue*)k_request_memory_block();
 	blockedMsgQueues->first = NULL;
 	blockedMsgQueues->last = NULL;
 	blockedMsgQueues->size = 0;
+	
+	//Initialization of interrupt stack
+	interruptedProcessStack = (ProcessQueue*)k_request_memory_block();
+	interruptedProcessStack->first = NULL;
+	interruptedProcessStack->last = NULL;
+	interruptedProcessStack->size = 0;
 	
 	//Initialization of delayed message queue
 	msgDelayQueue = (MessageQueue*)k_request_memory_block();
@@ -61,9 +67,15 @@ void process_init() {
 	nullProcessNode = (ProcessNode*)k_request_memory_block();
 	init_pcb(&null_process, nullProcessNode, 4);
 	
+	
 	// User processes initialization
 	for (i = 0; i < ProcessCount; ++i)
 		add_new_prioritized_process(ProcessTable[i], 0);
+		
+	//Interrupt process initialization
+	iProcArr[TIMER] = (ProcessNode*)k_request_memory_block();
+	init_pcb(&timer_i_process, iProcArr[TIMER], 3);
+		
 }
 
 int k_set_process_priority(int process_ID, int priority) {
@@ -114,13 +126,18 @@ int k_get_process_priority(int process_ID) {
 }
 
 // Return the process that should be executed
-ProcessNode* scheduler(void){
+ProcessNode* scheduler(process_type nextProcessType){
+	if(nextProcessType == INTERRUPT_TIMER){
+		return iProcArr[TIMER];
+	}else if(nextProcessType == INTERRUPT_UART){
+		return iProcArr[UART];
+	}
 	if (curProcess == NULL) {
 		// First time executing
 	  curProcess = poll_process(readyQueue);
 	  return curProcess;
 	}
-	else if (readyQueue->first != NULL) {
+	else if (nextProcessType == REGULAR && readyQueue->first != NULL) {
 		return poll_process(readyQueue);
 	}
 	return nullProcessNode;
@@ -186,6 +203,7 @@ int k_voluntarily_release_processor() {
 
 // This is an internal API call for releasing current process with a new specified state
 int k_release_processor(proc_state_t newState) {
+	process_type nextProcessType = REGULAR;
 	if (curProcess != NULL)
 		curProcess->pcb.m_state = newState;
 	
@@ -200,8 +218,16 @@ int k_release_processor(proc_state_t newState) {
 		case MSG_WAIT:
 			push_process(blockedMsgQueues, curProcess);
 			break;
+		case INTERRUPT_TIMER:
+			push_process_to_front(interruptedProcessStack, curProcess);
+			nextProcessType = TIMER;
+			break;
+		case INTERRUPT_UART:
+			push_process_to_front(interruptedProcessStack, curProcess);
+			nextProcessType = UART;
+			break;
 	}
-	switch_process();
+	switch_process(nextProcessType);
 	return 0;
 }
 
@@ -266,14 +292,14 @@ void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 }
 
 // Internal call for releasing processor
-int switch_process(void)
+int switch_process(process_type nextProcessType)
 {
 	volatile int i;
 	volatile proc_state_t state;
 	ProcessNode *oldProcess = NULL;
 	ProcessNode *newProcess = NULL;
 
-	newProcess = scheduler();
+	newProcess = scheduler(nextProcessType);
 	if (curProcess == NULL) {
 	 return -1;
 	}
@@ -401,3 +427,13 @@ void k_dec_delay_msg_time(){
 		}
 	}
 }
+
+void timer_i_process(){
+	while(1){
+		k_dec_delay_msg_time();
+		g_timer_count++ ;
+		release_processor();
+	}
+}
+
+

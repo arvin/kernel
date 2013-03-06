@@ -233,7 +233,7 @@ int uart_put_char(int n_uart, unsigned char c)
 {
 
 	LPC_UART_TypeDef *pUart;
-	__disable_irq();
+	atomic(0);
 	if(n_uart == 0 ) { /* UART0 is implemented */
 		pUart = (LPC_UART_TypeDef *)LPC_UART0;
 	} else { /* other UARTs are not implemented */

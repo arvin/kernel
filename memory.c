@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "process.h"
 #include "uart.h"
+#include "atomic.h"
 
 extern void* Image$$RW_IRAM1$$ZI$$Limit;
 
@@ -75,9 +76,9 @@ void removeFromList(LinkedList *list, Node* temp) {
 
 int k_release_memory_block(void* memory_block){
 		Node* temp;
-		__disable_irq();
+		atomic(0);
 		if(!memory_block){
-			__enable_irq();
+			atomic(1);
 			return -1; //Error
 		}
 		temp = MemoryList->first;
@@ -87,12 +88,12 @@ int k_release_memory_block(void* memory_block){
 					insertToList(FreeMemoryList, temp);
 					// Unblock any processes if possible
 					unblock_process();
-					__enable_irq();
+					atomic(1);
 					return 0; //Success
 				}
 				temp = temp->next;
 		}
-		__enable_irq();
+		atomic(1);
 		return -1; //Error
 }
 
@@ -113,7 +114,7 @@ void* k_request_memory_block() {
 
 	Node* currentNode;
 	uint32_t block;
-	__disable_irq();
+	atomic(0);
 	// Check if any memory has been freed
 	if(FreeMemoryList->first != NULL) {
 		currentNode = getBlockFromFreeLinkedList();
@@ -122,7 +123,7 @@ void* k_request_memory_block() {
 	//search for memory block in pool
 	else if (hasUnusedMemory()){
 		// No more memory
-			__enable_irq();
+		atomic(1);
 		return NULL;
 	}
 	else {
@@ -132,7 +133,7 @@ void* k_request_memory_block() {
 		setNewStartingAddress();
 	}
 	insertToList(MemoryList, currentNode);
-	__enable_irq();
+	atomic(1);
 	return (void*)block;
 }
 
