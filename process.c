@@ -34,8 +34,8 @@ void keyboard_proc(void){
 	  char curChar;
 	  int index = 0;
 	  while(1){
-			msg = (Message *) k_recieve_message(&sender_id);
-			while(curchar != '\n'){
+			msg = (Message *) k_receive_message(&sender_id);
+			while(curChar != '\n'){
 			    curChar = 'a';
 				  buffer[index++] = curChar;
 			}
