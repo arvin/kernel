@@ -108,7 +108,8 @@ __asm void TIMER0_IRQHandler(void)
 void c_TIMER0_IRQHandler(void)
 {
 	/* ack inttrupt, see section  21.6.1 on pg 493 of LPC17XX_UM */
-	k_release_processor(INTERRUPT_TIMER);
+	//k_release_processor(INTERRUPT_TIMER);
+	timer_i_process();
 	LPC_TIM0->IR = BIT(0);
 	
 	

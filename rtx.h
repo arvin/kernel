@@ -57,13 +57,4 @@ extern void k_dec_delay_msg_time(void);
 #define dec_delay_msg_time() _dec_delay_msg_time((U32)k_dec_delay_msg_time)
 int _dec_delay_msg_time(U32 p_func) __SVC_0;
 
-extern int k_uart_put_string(unsigned char *s);
-#define uart_put_string(s) _uart_put_string((U32)k_uart_put_string, s) 
-int _uart_put_string(U32 p_func, unsigned char *s) __SVC_0;
-
-extern void k_uart_put_int(int val);
-#define uart_put_int(val) _uart_put_int((U32)k_uart_put_int, val) 
-void _uart_put_int(U32 p_func, int val) __SVC_0;
-
-
 #endif /* !_RTX_H_ */

@@ -6,7 +6,7 @@ void atomic(int on){
 	if(on){
 		if(--sem == 0){
 		NVIC_EnableIRQ(TIMER0_IRQn);
-	__enable_irq();
+	  __enable_irq();
 		}
 	}else{
 		if(++sem == 1){

@@ -12,8 +12,9 @@
 #include "message.h"
 
 /* process states, note we only assume three states in this example */
-typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, INTERRUPT_TIMER, INTERRUPT_UART} proc_state_t;  
-typedef enum{TIMER = 0, UART, REGULAR} process_type;
+typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT} proc_state_t;  
+
+typedef enum {TIMER = 0, UART} processType;
 
 /*
   PCB data structure definition.
@@ -46,11 +47,11 @@ typedef struct ProcessQueue {
 
 void process_init(void);    /* initialize all procs in the system */
 void init_pcb(void* process, ProcessNode* node, int priority);
-ProcessNode* scheduler(process_type nextProcessType);               /* pick the pid of the next to run process */
+ProcessNode* scheduler(void);               /* pick the pid of the next to run process */
 int k_add_new_process(void*);
 int add_new_prioritized_process(void*, int priority);
 int k_voluntarily_release_processor(void);				/* user release_process function */
-int switch_process(process_type nextProcessType);       /* kernel release_process function */
+int switch_process(void);       /* kernel release_process function */
 int k_set_process_priority(int process_ID, int priority);
 int k_get_process_priority(int process_ID);
 int k_release_processor(proc_state_t newState);

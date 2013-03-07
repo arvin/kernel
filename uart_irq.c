@@ -126,6 +126,7 @@ int uart_init(int n_uart) {
 
 	/* Step 6b: enable the UART interrupt from the system level */
 	NVIC_EnableIRQ(UART0_IRQn); /* CMSIS function */
+	
 
 	return 0;
 }
@@ -163,7 +164,8 @@ void c_UART0_IRQHandler(void)
 		g_UART0_buffer[g_UART0_count++] = pUart->RBR;
 		if (g_UART0_count == BUFSIZE) {
 			g_UART0_count = 0; /* buffer overflow */
-		}	
+		}
+		uart_i_process((uint8_t *)g_UART0_buffer, g_UART0_count);
 	} else if (IIR_IntId & IIR_THRE) { 
 		/* THRE Interrupt, transmit holding register empty*/
 		
@@ -193,22 +195,25 @@ void c_UART0_IRQHandler(void)
 			if ( g_UART0_count == BUFSIZE ) {
 				g_UART0_count = 0;  /* buffer overflow */
 			}	
+
+			uart_i_process((uint8_t *)g_UART0_buffer, g_UART0_count);
 		}	    
 	} else { /* IIR_CTI and reserved combination are not implemented */
 		return;
 	}	
 }
 
-void uart_send_string( uint32_t n_uart, uint8_t *p_buffer, uint32_t len )
+void uart_i_process( uint8_t *p_buffer, uint32_t len )
 {
 	LPC_UART_TypeDef *pUart;
+	LPC_UART0->IER = IER_THRE | IER_RLS; 
+	g_UART0_count = 0;
+			
+			/* Re-enable RBR, THRE left as enabled */
+	
+	pUart = (LPC_UART_TypeDef *)LPC_UART0;
 
-	if(n_uart == 0 ) { /* UART0 is implemented */
-		pUart = (LPC_UART_TypeDef *)LPC_UART0;
-	} else { /* other UARTs are not implemented */
-		return;
-	}
-
+	
 	while ( len != 0 ) {
 		/* THRE status, contain valid data  */
 		while ( !(g_UART0_TX_empty & 0x01) );	
@@ -217,33 +222,36 @@ void uart_send_string( uint32_t n_uart, uint8_t *p_buffer, uint32_t len )
 		p_buffer++;
 		len--;
 	}
+	LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR;
 	return;
 }
 
-int k_uart_put_string(unsigned char *s)
+int uart_put_string(unsigned char *s)
 {
+	int i = 1;
   while (*s !=0) {              /* loop through each char in the string */
 		while ( !(g_UART0_TX_empty & 0x01) );	
     uart_put_char(0, *s++);/* print the char, then ptr increments  */
 		g_UART0_TX_empty = 0;  // not empty in the THR until it shifts out
   }
+	i = 0;
   return 0;
 }
+
   
 int uart_put_char(int n_uart, unsigned char c)
 {
 
 	LPC_UART_TypeDef *pUart;
-	atomic(0);
+
 	if(n_uart == 0 ) { /* UART0 is implemented */
 		pUart = (LPC_UART_TypeDef *)LPC_UART0;
 	} else { /* other UARTs are not implemented */
-		atomic(1);
 		return -1;
 	}
 	
 	pUart->THR = c;
-	atomic(1);
+
 	return 0;
 }
 
@@ -254,10 +262,10 @@ void uart_put_hex(int val) {
 		 char c = (0xF & (val >> (i * 4)));
 		 uart_put_char(0, c + (c < 10 ? '0' : ('A' - 10)));
 	}
-		k_uart_put_string("\n\r");
-	}
+		uart_put_string("\n\r");
+}
 
-void k_uart_put_int(int val) {
+void uart_put_int(int val) {
 	int i;
 	int temp;
 	int original;

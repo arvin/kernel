@@ -16,7 +16,8 @@ void addMessage(MessageQueue* queue, Message* msg, int delay){
 	queue->last = node;
 	node->next = NULL;
 	queue->size++;
-	__enable_irq();
+	atomic(1);
+	//__enable_irq();
 }
 
 MessageNode* pollMessageQueue(MessageQueue* queue) {
@@ -25,7 +26,7 @@ MessageNode* pollMessageQueue(MessageQueue* queue) {
 	node = queue->first;
 	
 	if (node == NULL) {
-		__enable_irq();
+		atomic(1);
 		return NULL;
 	}
 	queue->first = node->next;
@@ -34,7 +35,7 @@ MessageNode* pollMessageQueue(MessageQueue* queue) {
 	}
 	node->next = NULL;
 	queue->size--;
-	__enable_irq();
+	atomic(1);
 	return node;
 }
 

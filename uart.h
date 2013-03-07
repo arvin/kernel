@@ -56,9 +56,9 @@
 int uart_init(int n_uart); /* initialize the n_uart, interrupt driven */
 
 /* write a string to the n_uart */
-void uart_send_string( uint32_t n_uart, uint8_t *p_buffer, uint32_t len );
-int k_uart_put_string(unsigned char *s);
+int uart_put_string(unsigned char *s);
 int uart_put_char(int n_uart, unsigned char c);
 void uart_put_hex(int val);
-void k_uart_put_int(int val);
+void uart_put_int(int val);
+void uart_i_process(uint8_t *p_buffer, uint32_t len);
 #endif /* ! _UART_H_ */

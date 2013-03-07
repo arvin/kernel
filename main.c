@@ -10,22 +10,21 @@
 int main() {
 	SystemInit();
 	
-	//timer_init(0);
-
+	
 	atomic(0);
 	uart_init(0);
 	memory_init();
 	process_init();
-
+	timer_init(0);
 	atomic(1);
-	k_uart_put_string("======================================\n\r");
-	k_uart_put_string("RTX has been initialized successfully.\n\r");
-	k_uart_put_string("======================================\n\r\n\r");
+	uart_put_string("======================================\n\r");
+	uart_put_string("RTX has been initialized successfully.\n\r");
+	
+	
 
-	
-	
 	__set_CONTROL(__get_CONTROL() | BIT(0));  //user mode enabled
-	
+
+	uart_put_string("======================================\n\r\n\r");
 	release_processor();
 	
 	return 0;
