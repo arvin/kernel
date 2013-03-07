@@ -28,7 +28,7 @@ void null_process(void) {
 
 void keyboard_proc(void){
     Message *msg;
-	  int sender_id = 9;
+	  int sender_id = 9; //random id;
 	  char buffer[200];
 	  char curChar;
 	  int index = 0;
@@ -42,6 +42,17 @@ void keyboard_proc(void){
 		}
 }
 
+void crt_proc(void){
+    Message* msg = NULL;
+	  int sender_id = 10;
+	  char* string;
+	  while(1){
+			sender_id = 10; //some random id
+		    msg = (Message*) k_receive_message(&sender_id);
+				string = (char*)(msg->data);
+			  k_uart_put_string(string);
+    }
+}
 void process_init() {
   int i;
 	// Ready queue initialization
