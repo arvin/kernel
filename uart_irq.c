@@ -213,8 +213,8 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len ){
 	Message *inputMsg;
 	Message *cmdMsg;
 	char* inputData;
+	char* crtData;
 	int i = 0;
-	int start = command_index;
 	LPC_UART0->IER = IER_THRE | IER_RLS; 
 	g_UART0_count = 0;
 			
@@ -227,30 +227,49 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len ){
 			data_buff = k_request_memory_block();
 			*data_buff = *p_buffer;
 		}else if(read_command == TRUE){
-			command_index=0;
 			if(command_index <BUFSIZE-1){
-				*(data_buff + command_index) = *p_buffer;
-				command_index++;
-			}else if(*p_buffer == '\r'){
-				*(data_buff + 1) = '\0';
-				cmdMsg = (Message*)k_request_memory_block();
-				cmdMsg->data = data_buff;
-				cmdMsg->type = COMMAND_REG;
-				cmdMsg->dest_pid = get_system_pid(KCD);
-				cmdMsg->sender_pid = get_system_pid(UART);
-				send_msg(get_system_pid(KCD), cmdMsg, 0);
-				read_command = FALSE;
-				command_index = 0;
+				
+				if(*p_buffer == (char)13){
+				//	*(data_buff + 1) = '\0';
+					cmdMsg = (Message*)k_request_memory_block();
+					cmdMsg->data = data_buff;
+					cmdMsg->type = COMMAND;
+					cmdMsg->dest_pid = k_get_system_pid(KCD);
+					cmdMsg->sender_pid = k_get_system_pid(UART);
+					send_msg(k_get_system_pid(KCD), cmdMsg, 0);
+					
+					
+					inputMsg = (Message*)k_request_memory_block();
+					inputData = (char*)k_request_memory_block();
+					*(data_buff + command_index) = '\0';
+					for(i = 0; i <= command_index; i++){
+						*(inputData + i) = *(data_buff + i);
+					}
+					inputMsg->data = inputData;
+
+					inputMsg->type = CRT_DISPLAY;
+					inputMsg->dest_pid = k_get_system_pid(CRT);
+					inputMsg->sender_pid = k_get_system_pid(UART);
+					send_msg(k_get_system_pid(CRT), inputMsg, 0);
+					
+					read_command = FALSE;
+					command_index = 0;
+					
+				}else{
+					*(data_buff + command_index) = *p_buffer;
+					command_index++;
+				}
 			}
 		}else{	
 			inputMsg = (Message*)k_request_memory_block();
-			inputMsg->data = data_buff;
-			inputMsg->type = KEYBOARD_INPUT;
-			inputMsg->dest_pid = get_system_pid(KCD);
-			inputMsg->sender_pid = get_system_pid(UART);
-			send_msg(get_system_pid(KCD), inputMsg, 0);
 
-			
+			inputData = (char*)k_request_memory_block();
+			*inputData = *p_buffer;
+			inputMsg->data = inputData;
+			inputMsg->type = KEYBOARD_INPUT;
+			inputMsg->dest_pid = k_get_system_pid(KCD);
+			inputMsg->sender_pid = k_get_system_pid(UART);
+			send_msg(k_get_system_pid(KCD), inputMsg, 0);
 	  }
 		p_buffer++;
 	  len--;
@@ -258,17 +277,16 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len ){
 			
   if (read_command == TRUE) {
 		inputMsg = (Message*)k_request_memory_block();
-		inputData = (char*)k_request_memory_block();
-		*(data_buff + command_index) = '\0';
-		for(i = 0; i <= command_index; i++){
-			*(inputData + i) = *(data_buff + i);
-		}
-		inputMsg->data = inputData;
+		crtData = (char*)k_request_memory_block();
+		//*(data_buff + command_index) = '\0';
+		*crtData = *(data_buff+command_index-1);\
+		*(crtData + 1) = '\0';
+		inputMsg->data = crtData;
 
 		inputMsg->type = CRT_DISPLAY;
-		inputMsg->dest_pid = get_system_pid(CRT);
-		inputMsg->sender_pid = get_system_pid(UART);
-		send_msg(get_system_pid(CRT), inputMsg, 0);
+		inputMsg->dest_pid = k_get_system_pid(CRT);
+		inputMsg->sender_pid = k_get_system_pid(UART);
+		send_msg(k_get_system_pid(CRT), inputMsg, 0);
 	}		
 
 

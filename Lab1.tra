@@ -12,8 +12,9 @@
 ### List of Objects: adding '"timer.o"'
 ### List of Objects: adding '"uart_irq.o"'
 ### List of Objects: adding '"atomic.o"'
+### List of Objects: adding '"lib.o"'
 ### ADS-LD Command completed:
---cpu Cortex-M3 "startup_lpc17xx.o" "system_lpc17xx.o" "main.o" "process.o" "userproc.o" "hal.o" "memory.o" "message.o" "timer.o" "uart_irq.o" "atomic.o" 
+--cpu Cortex-M3 "startup_lpc17xx.o" "system_lpc17xx.o" "main.o" "process.o" "userproc.o" "hal.o" "memory.o" "message.o" "timer.o" "uart_irq.o" "atomic.o" "lib.o" 
 --strict --scatter "Lab1.sct" 
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
 --info sizes --info totals --info unused --info veneers 
@@ -21,7 +22,7 @@
 ### ADS-LD Output File: 'Lab1.axf'
 ### ADS-LD Command File: 'Lab1.lnp'
 ### Checking for dirty Components...
-### Creating CmdFile 'Lab1.lnp', Handle=0x00000DBC
+### Creating CmdFile 'Lab1.lnp', Handle=0x00000C14
 ### Writing '.lnp' file
 ### ADS-LD Command file 'Lab1.lnp' is ready.
 ### ADS-LD: About to start ADS-LD Thread.

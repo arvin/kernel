@@ -3,6 +3,7 @@
 #include "process.h"
 #include "userproc.h"
 #include "rtx.h"
+#include "lib.h"
 
 #ifdef DEBUG_0
 #include <stdio.h>
@@ -19,6 +20,8 @@ ProcessNode* systemProcesses[5];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
 int g_timer_count = 0;
+int start_clk = FALSE;
+int wall_clk_handler = 0;
 
 void null_process(void) {
 	while(1) {
@@ -26,20 +29,42 @@ void null_process(void) {
 	}
 }
 
+
 void keyboard_proc(void){
     Message *msg;
-	  int sender_id = get_system_pid(KCD); //random id;
+		char* msg_data;
+	  int sender_id = k_get_system_pid(KCD); //random id;
 	  char curChar;
 	  int hot_key = 0;
 	  int read_input = 0;
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
-
-			release_memory_block(msg->data);
-			release_memory_block(msg);
+			msg_data = (char*) msg->data;
+			
+			//Check the contents of the message
+			if(msg->type == COMMAND_REG){
+				if(string_equals(msg_data, "%W")){
+					wall_clk_handler = msg->sender_pid;
+					release_memory_block(msg_data);
+					release_memory_block(msg);
+				}
+			}else if(msg->type == COMMAND){
+				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || string_equals(msg_data, "%WS")){
+					if(wall_clk_handler != 0){
+							msg->sender_pid = k_get_system_pid(KCD);
+							msg->dest_pid = wall_clk_handler;
+							send_message(wall_clk_handler, msg);
+					}else{
+						release_memory_block(msg_data);
+						release_memory_block(msg);
+					}
+				}
+			}else if(msg->type == KEYBOARD_INPUT){
+				release_memory_block(msg_data);
+				release_memory_block(msg);
+			}
 		}
 }
-
 
 void crt_proc(){
 	Message* msg;
@@ -57,11 +82,16 @@ void crt_proc(){
 }
 
 
+
 void timer_i_process(){
 		k_dec_delay_msg_time();
 		g_timer_count++ ;
+		if(start_clk){
+			
+		}
 		g_timer_count %= 3600*24*1000;
 }
+
 
 void display_time(){
 		Message* msg;
@@ -89,6 +119,7 @@ void display_time(){
 			k_release_memory_block(msg);
 		}
 }
+
 
 void process_init() {
   int i;
@@ -150,6 +181,7 @@ void process_init() {
 	push_process(readyQueue, systemProcesses[WALL_CLOCK]);
 }
 
+
 int k_set_process_priority(int process_ID, int priority) {
 	ProcessNode* node = readyQueue->first;
 
@@ -170,6 +202,7 @@ int k_set_process_priority(int process_ID, int priority) {
 	
 	return -1;
 }
+
 
 int k_get_process_priority(int process_ID) {
 	
@@ -196,6 +229,7 @@ int k_get_process_priority(int process_ID) {
 
 	return -1;
 }
+
 
 // Return the process that should be executed
 ProcessNode* scheduler(void){
@@ -232,6 +266,7 @@ void init_pcb(void* process, ProcessNode* node, int priority, int isStackRequire
 	}
 }
 
+
 void init_proc_stack(void* process, ProcessNode* node) {
 	int i;
 	uint32_t* stackBlockStart = (uint32_t*)k_request_memory_block();
@@ -253,10 +288,12 @@ void init_proc_stack(void* process, ProcessNode* node) {
 	}
 }
 
+
 // This is an API call for creating new user processes
 int k_add_new_process(void* process) {
 	return add_new_prioritized_process(process, 3);
 }
+
 
 // This is an internal call for creating new processes
 int add_new_prioritized_process(void* process, int priority) {
@@ -266,10 +303,12 @@ int add_new_prioritized_process(void* process, int priority) {
 	return 0;
 }
 
+
 // This is an API call for releasing current user process
 int k_voluntarily_release_processor() {
 	return k_release_processor(RDY);
 }
+
 
 // This is an internal API call for releasing current process with a new specified state
 int k_release_processor(proc_state_t newState) {
@@ -294,6 +333,7 @@ int k_release_processor(proc_state_t newState) {
 }
 
 
+
 // Remove first process from the specified queue
 ProcessNode* poll_process(ProcessQueue* queue) {
 	ProcessNode* node = queue->first;
@@ -308,6 +348,7 @@ ProcessNode* poll_process(ProcessQueue* queue) {
 	queue->size--;
 	return node;
 }
+
 
 // Remove process from the specified queue with specified process ID
 ProcessNode* remove_process(ProcessQueue* queue, int pid) {
@@ -331,6 +372,7 @@ ProcessNode* remove_process(ProcessQueue* queue, int pid) {
 	return NULL;
 }
 
+
 // Add process to the back of the specified queue
 void push_process(ProcessQueue* queue, ProcessNode* node) {
 	if (queue->first == NULL) {
@@ -344,6 +386,7 @@ void push_process(ProcessQueue* queue, ProcessNode* node) {
 	queue->size++;
 }
 
+
 // Add process to the back of the specified queue
 void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 	if (queue->first == NULL) {		
@@ -354,9 +397,9 @@ void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 	queue->size++;
 }
 
+
 // Internal call for releasing processor
-int switch_process(void)
-{
+int switch_process(void) {
 	volatile int i;
 	volatile proc_state_t state;
 	ProcessNode *oldProcess = NULL;
@@ -397,6 +440,7 @@ int switch_process(void)
 	return 0;
 }
 
+
 // If memory is available, unblock the process with the highest priority
 void unblock_process() {
 	int i;
@@ -420,9 +464,11 @@ void unblock_process() {
 	}
 }
 
+
 int k_send_message(int process_ID, void *messageEnvelope) {
 	return send_msg(process_ID, messageEnvelope, 1);
 }
+
 
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
 	ProcessNode* node;
@@ -445,15 +491,18 @@ int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
 }
 
 
+
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
 	Message* msg = (Message*)MessageEnvelope;
 	addMessage(msgDelayQueue, msg, delay);
 	return 0;
 }
 
+
 void* k_receive_message(int* sender_id) {
     return removeMessage(&(curProcess->pcb.msgQueue), sender_id);
 }
+
 
 void k_dec_delay_msg_time(){
 	MessageNode* temp;
@@ -496,9 +545,11 @@ void k_dec_delay_msg_time(){
 	}
 }
 
-int get_system_pid(system_proc_type type){
+
+int k_get_system_pid(system_proc_type type){
     return systemProcesses[type]->pcb.m_pid;
 }
+
 
 void print_process(){
 	/*

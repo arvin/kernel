@@ -182,7 +182,7 @@ void proc5(void) {
 		release_processor();
 	while (true);
 }
-
+/*
 void proc6(void) {
 	int result;
 	
@@ -221,6 +221,59 @@ void proc6(void) {
 	do
 		release_processor();
 	while (true);
+}
+*/
+
+void proc6(void){
+	//24 hour wall clock - is supposed to ba a user level process
+	Message *new_Message;
+	Message *msg;
+	char* message_data;
+	char* s = "%W";
+	int sender_id = 2;
+	char* received_msg_data;
+	
+	uart_put_string("Test 7: 24 Hour Wall Clock Display Process\n\r");
+	
+	new_Message = (Message*) request_memory_block();
+	message_data = (char*)request_memory_block();
+	message_data = s;
+ 	
+	new_Message->data = (void*) message_data;
+	new_Message->sender_pid = 6;
+	new_Message->dest_pid = get_system_pid(KCD);
+	new_Message->type = COMMAND_REG;
+
+	send_message(get_system_pid(KCD), (void*) new_Message);
+	
+	while(1)
+	{
+		msg = (Message*)receive_message(& sender_id);
+
+		received_msg_data =  (msg->data);
+		uart_put_string("I received\r\n");
+		uart_put_string(received_msg_data);
+		uart_put_string("\n");
+		
+	 if(msg->type == COMMAND){
+			if(string_equals(msg_data, "%WR")){
+					
+			}else if(string_equals(msg_data, "%WS")){
+				
+			}else if(string_equals(msg_data, "%WT")){
+				
+			}
+	}
+		
+		release_memory_block(msg->data);
+		release_memory_block(msg);
+
+	}
+	
+	do
+		release_processor();
+	while (true);
+	
 }
 
 int ProcessCount = 6;

@@ -12,9 +12,7 @@
 #include "message.h"
 
 /* process states, note we only assume three states in this example */
-typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT} proc_state_t;  
-
-typedef enum {TIMER = 0, UART, KCD, CRT, WALL_CLOCK} system_proc_type;
+typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, WAIT_FOR_INTERRUPT} proc_state_t;  
 
 /*
   PCB data structure definition.
@@ -71,6 +69,7 @@ void k_dec_delay_msg_time(void);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
 void timer_i_process(void);
 void display_time(void);
-int get_system_pid(system_proc_type type);
+int k_get_system_pid(system_proc_type type);
 void print_process(void);
+
 #endif /* ! _PROCESS_H_ */

@@ -21,7 +21,10 @@ typedef struct Message{
 	  void* data;
 }Message;
 
-typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG} msg_type;
+typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND} msg_type;
+
+typedef enum {TIMER = 0, UART, KCD, CRT, WALL_CLOCK} system_proc_type;
+
 
 #define __SVC_0  __svc_indirect(0)
 
@@ -60,5 +63,9 @@ int _delayed_send(U32 p_func, int process_ID, void* MessageEnvelope, int delay) 
 extern void k_dec_delay_msg_time(void);
 #define dec_delay_msg_time() _dec_delay_msg_time((U32)k_dec_delay_msg_time)
 int _dec_delay_msg_time(U32 p_func) __SVC_0;
+
+extern int k_get_system_pid(system_proc_type type);
+#define get_system_pid(type) _get_system_pid((U32)k_get_system_pid, type)
+int _get_system_pid(U32 p_func, system_proc_type type) __SVC_0;
 
 #endif /* !_RTX_H_ */
