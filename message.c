@@ -41,7 +41,6 @@ MessageNode* pollMessageQueue(MessageQueue* queue) {
 
 // Add process to the back of the specified queue
 Message* removeMessage(MessageQueue* queue, int* sender_id) {
-	volatile MessageQueue* meh = queue;
 	while(1){
 		MessageNode* node = pollMessageQueue(queue);
 		if(node != NULL) {
@@ -50,7 +49,21 @@ Message* removeMessage(MessageQueue* queue, int* sender_id) {
 			k_release_memory_block((void*)node);
 			return message;
 		}
-		k_release_processor(MSG_WAIT);
+		
+		save_release_processor();
 	}
 }
 
+__asm void save_release_processor(void)
+{
+	PRESERVE8
+	IMPORT wait_on_message
+	PUSH{r4-r11, lr}
+	BL wait_on_message
+	POP{r4-r11, lr}
+	BX lr
+}
+
+void wait_on_message() {
+	k_release_processor(MSG_WAIT);
+}
