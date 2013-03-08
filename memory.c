@@ -28,7 +28,7 @@ void memory_init() {
 
 void setNewStartingAddress() {
 	// Notice that total size of a block is 128 bytes plus the size of a node structure
-	MemoryList->newStartingAddress = MemoryList->newStartingAddress + 48 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node);
+	MemoryList->newStartingAddress = MemoryList->newStartingAddress + 64 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node);
 }
 
 Node* getBlockFromFreeLinkedList() {

@@ -1,11 +1,15 @@
 #include <LPC17xx.h>
+#include "rtx.h"
 #include "uart.h"
 #include "atomic.h"
+#include "process.h"
 
 volatile uint8_t g_UART0_TX_empty=1;
 volatile uint8_t g_UART0_buffer[BUFSIZE];
 volatile uint32_t g_UART0_count = 0;
-
+volatile int read_command = FALSE;
+volatile uint8_t command_buffer[BUFSIZE];
+volatile uint32_t command_index = 0;
 /**
  * @brief: initialize the n_uart
  * NOTES: only fully supports uart0 so far, but can be easily extended 
@@ -164,7 +168,7 @@ void c_UART0_IRQHandler(void)
 		g_UART0_buffer[g_UART0_count++] = pUart->RBR;
 		if (g_UART0_count == BUFSIZE) {
 			g_UART0_count = 0; /* buffer overflow */
-		}
+		}		
 		uart_i_process((uint8_t *)g_UART0_buffer, g_UART0_count);
 	} else if (IIR_IntId & IIR_THRE) { 
 		/* THRE Interrupt, transmit holding register empty*/
@@ -205,50 +209,103 @@ void c_UART0_IRQHandler(void)
 
 void uart_i_process( uint8_t *p_buffer, uint32_t len )
 {
-	LPC_UART_TypeDef *pUart;
+	//keyboard input
+	//command reg
+	Message *inputMsg;
+	Message *cmdMsg;
+	int i = 0;
+	int start = command_index;
+	char* inputData;
+	char* cmdData;
 	LPC_UART0->IER = IER_THRE | IER_RLS; 
 	g_UART0_count = 0;
 			
 			/* Re-enable RBR, THRE left as enabled */
 	
-	pUart = (LPC_UART_TypeDef *)LPC_UART0;
+	while ( len != 0 ) {
+		if(*p_buffer  == '%'){
+			read_command = TRUE;
+			command_index = 0;
+			command_buffer[command_index++] = *p_buffer;
+		}else if(read_command == TRUE){
+			if(command_index <BUFSIZE-1){
+				command_buffer[command_index++] = *p_buffer;
+			}else if(*p_buffer == '\r'){
+				command_buffer[command_index++] = '\0';
+				cmdMsg = (Message*)k_request_memory_block();
+				cmdData = k_request_memory_block();
+				for(i = 0;i<command_index;i++){
+				    *(cmdData+i) = command_buffer[i];
+        }
+				cmdMsg->data = cmdData;
+				cmdMsg->type = COMMAND_REG;
+				cmdMsg->dest_pid = get_system_pid(KCD);
+				cmdMsg->sender_pid = get_system_pid(UART);
+				send_msg(get_system_pid(KCD), cmdMsg, 0);
+				read_command = FALSE;
+				command_index = 0;
+			}
+		}else{	
+			inputMsg = (Message*)k_request_memory_block();
+			inputData = k_request_memory_block();
+			*(inputData) = *p_buffer;
+			inputMsg->data = inputData;
+			inputMsg->type = KEYBOARD_INPUT;
+			inputMsg->dest_pid = get_system_pid(KCD);
+			inputMsg->sender_pid = get_system_pid(UART);
+			send_msg(get_system_pid(KCD), inputMsg, 0);
+			/*
+			while ( !(g_UART0_TX_empty & 0x01) );	
+			pUart->THR = *p_buffer;
+			*(data++) = *p_buffer; 
+			g_UART0_TX_empty = 0;  // not empty in the THR until it shifts out
+			p_buffer++;
+			len--;
+			*/
+			
+	  }
+		p_buffer++;
+	  len--;
+  }
+			
+  if (read_command == TRUE) {
+		inputMsg = (Message*)k_request_memory_block();
+		inputData = k_request_memory_block();
+		for(i = start;i<command_index;i++){
+			*(inputData+i) = command_buffer[i];
+    }
+		*(inputData+i) = '\0';  
+		inputMsg->data = inputData;
+		inputMsg->type = CRT_DISPLAY;
+		inputMsg->dest_pid = get_system_pid(CRT);
+		inputMsg->sender_pid = get_system_pid(UART);
+		send_msg(get_system_pid(CRT), inputMsg, 0);
+	}		
+
 
 	
-	while ( len != 0 ) {
-		/* THRE status, contain valid data  */
-		while ( !(g_UART0_TX_empty & 0x01) );	
-		pUart->THR = *p_buffer;
-		g_UART0_TX_empty = 0;  // not empty in the THR until it shifts out
-		p_buffer++;
-		len--;
-	}
+	
 	LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR;
 	return;
 }
 
 int uart_put_string(unsigned char *s)
 {
-	int i = 1;
   while (*s !=0) {              /* loop through each char in the string */
 		while ( !(g_UART0_TX_empty & 0x01) );	
-    uart_put_char(0, *s++);/* print the char, then ptr increments  */
+    uart_put_char(*s++);/* print the char, then ptr increments  */
 		g_UART0_TX_empty = 0;  // not empty in the THR until it shifts out
   }
-	i = 0;
   return 0;
 }
 
   
-int uart_put_char(int n_uart, unsigned char c)
+int uart_put_char(unsigned char c)
 {
 
 	LPC_UART_TypeDef *pUart;
-
-	if(n_uart == 0 ) { /* UART0 is implemented */
-		pUart = (LPC_UART_TypeDef *)LPC_UART0;
-	} else { /* other UARTs are not implemented */
-		return -1;
-	}
+	pUart = (LPC_UART_TypeDef *)LPC_UART0;
+	
 	
 	pUart->THR = c;
 
@@ -260,7 +317,7 @@ void uart_put_hex(int val) {
 	int i;
 	 for (i = 7; i >= 0; --i) {
 		 char c = (0xF & (val >> (i * 4)));
-		 uart_put_char(0, c + (c < 10 ? '0' : ('A' - 10)));
+		 uart_put_char(c + (c < 10 ? '0' : ('A' - 10)));
 	}
 		uart_put_string("\n\r");
 }
@@ -271,13 +328,13 @@ void uart_put_int(int val) {
 	int original;
 	if (val < 0) {
 		val = -val;
-		uart_put_char(0, '-');
+		uart_put_char('-');
 	}
 	original = val;
 	for (i = 1000000000; i > 0; i /= 10) {
 		if (i < original) {
 			temp = val / i;
-			uart_put_char(0, temp + '0');
+			uart_put_char(temp + '0');
 		}
 		val %= i;
 	}

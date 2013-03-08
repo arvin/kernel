@@ -3,6 +3,8 @@
 
 // Constants
 #define NULL 0
+#define TRUE 1
+#define FALSE 0
 
 typedef unsigned int U32;
 
@@ -18,6 +20,8 @@ typedef struct Message{
 	  int type;
 	  void* data;
 }Message;
+
+typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG} msg_type;
 
 #define __SVC_0  __svc_indirect(0)
 

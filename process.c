@@ -14,8 +14,8 @@ ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
 
-pcb_t* procArr[7];
-ProcessNode* iProcArr[2];
+pcb_t* procArr[12];
+ProcessNode* systemProcesses[5];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
 int g_timer_count = 0;
@@ -28,35 +28,72 @@ void null_process(void) {
 
 void keyboard_proc(void){
     Message *msg;
-	  int sender_id = 9; //random id;
-	  char buffer[200];
+	  int sender_id = get_system_pid(KCD); //random id;
 	  char curChar;
-	  int index = 0;
+	  int hot_key = 0;
+	  int read_input = 0;
 	  while(1){
-			msg = (Message *) k_receive_message(&sender_id);
-			while(curChar != '\n'){
-			    curChar = 'a';
-				  buffer[index++] = curChar;
-			}
-			k_send_message(sender_id, msg);
+			msg = (Message *)receive_message(&sender_id);
+
+			k_release_memory_block(msg->data);
+			k_release_memory_block(msg);
 		}
 }
 
-void crt_proc(void){
-    Message* msg = NULL;
-	  int sender_id = 10;
-	  char* string;
-	  while(1){
-			sender_id = 10; //some random id
-		    msg = (Message*) k_receive_message(&sender_id);
-				string = (char*)(msg->data);
-			  k_uart_put_string(string);
-    }
+
+void crt_proc(){
+	Message* msg;
+	int sender_id;
+	unsigned char* msgData;
+	while(1) {
+		msg = (Message*)receive_message(& sender_id);
+		if(msg->type == CRT_DISPLAY){
+			msgData =  (msg->data);
+			uart_put_string(msgData);
+		}
+		k_release_memory_block(msg->data);
+		k_release_memory_block(msg);
+	}
 }
+
+
+void timer_i_process(){
+		k_dec_delay_msg_time();
+		g_timer_count++ ;
+		g_timer_count %= 3600*24*1000;
+}
+
+void display_time(){
+		Message* msg;
+		int sender_id;
+  	int count;
+  	int hh;
+  	int mm;
+  	int ss;
+	
+		while(1) {
+			msg = (Message*)receive_message(& sender_id);
+			
+			count = g_timer_count / 1000;
+			hh = count/3600;
+			mm = (count/60)%60;
+			ss = count%60;
+			uart_put_int(hh);
+			uart_put_char(':');
+			uart_put_int(mm);
+			uart_put_char(':');
+			uart_put_int(ss);
+			uart_put_string("\n");
+			
+			k_release_memory_block(msg->data);
+			k_release_memory_block(msg);
+		}
+}
+
 void process_init() {
   int i;
 	// Ready queue initialization
-	readyQueue = (ProcessQueue*)k_request_memory_block();
+	readyQueue = (ProcessQueue*)k_request_memory_block(	);
 	readyQueue->first = NULL;
 	readyQueue->last = NULL;
 	readyQueue->size = 0;
@@ -85,20 +122,32 @@ void process_init() {
 	// Null process initialization
 	curProcess = NULL;
 	nullProcessNode = (ProcessNode*)k_request_memory_block();
-	init_pcb(&null_process, nullProcessNode, 4);
+	init_pcb(&null_process, nullProcessNode, 4, TRUE);
 	
 	
 	// User processes initialization
 	for (i = 0; i < ProcessCount; ++i)
-		add_new_prioritized_process(ProcessTable[i], 0);
+		add_new_prioritized_process(ProcessTable[i], 2);
 		
 	//Interrupt process initialization
-	iProcArr[TIMER] = (ProcessNode*)k_request_memory_block();
-	init_pcb(&timer_i_process, iProcArr[TIMER], 3);
+	systemProcesses[TIMER] = (ProcessNode*)k_request_memory_block();
+	init_pcb(&timer_i_process, systemProcesses[TIMER], 3, FALSE);
 	
-	iProcArr[UART] = (ProcessNode*)k_request_memory_block();
-	init_pcb(&uart_i_process, iProcArr[UART], 3);
-		
+	systemProcesses[UART] = (ProcessNode*)k_request_memory_block();
+	init_pcb(&uart_i_process, systemProcesses[UART], 3, FALSE);
+	
+	// System process initialization
+	systemProcesses[KCD] = (ProcessNode*)k_request_memory_block();
+	init_pcb(&keyboard_proc, systemProcesses[KCD], 0, TRUE);
+	push_process(readyQueue, systemProcesses[KCD]);
+	
+	systemProcesses[CRT] = (ProcessNode*)k_request_memory_block();
+	init_pcb(&crt_proc, systemProcesses[CRT], 0, TRUE);
+	push_process(readyQueue, systemProcesses[CRT]);
+	
+	systemProcesses[WALL_CLOCK] = (ProcessNode*)k_request_memory_block();
+	init_pcb(&display_time, systemProcesses[WALL_CLOCK], 0, TRUE);
+	push_process(readyQueue, systemProcesses[WALL_CLOCK]);
 }
 
 int k_set_process_priority(int process_ID, int priority) {
@@ -161,9 +210,7 @@ ProcessNode* scheduler(void){
 		return nullProcessNode;
 }
 
-void init_pcb(void* process, ProcessNode* node, int priority) {
-	int i;
-	uint32_t* stackBlockStart = (uint32_t*)k_request_memory_block();
+void init_pcb(void* process, ProcessNode* node, int priority, int isStackRequired) {
 	node->next = NULL;
 	
 	// PCB initialization
@@ -177,7 +224,20 @@ void init_pcb(void* process, ProcessNode* node, int priority) {
 	node->pcb.msgQueue.last = NULL;
 	node->pcb.msgQueue.size = 0;
 	
+	if (isStackRequired)
+		init_proc_stack(process, node);
+	else {
+		node->pcb.mp_sp = NULL;
+		node->pcb.stack_boundary = NULL;
+	}
+}
+
+void init_proc_stack(void* process, ProcessNode* node) {
+	int i;
+	uint32_t* stackBlockStart = (uint32_t*)k_request_memory_block();
+	
 	// Stack initialization
+	node->pcb.stack_boundary = stackBlockStart;
 	node->pcb.mp_sp = stackBlockStart + USR_SZ_STACK;
 	node->pcb.mp_sp--;
 	/* 8 bytes alignment adjustment to exception stack frame */
@@ -201,16 +261,8 @@ int k_add_new_process(void* process) {
 // This is an internal call for creating new processes
 int add_new_prioritized_process(void* process, int priority) {
 	ProcessNode* node = (ProcessNode*)k_request_memory_block();
-	
-	
-	if (readyQueue->first == NULL)
-		readyQueue->first = node;
-	else
-		readyQueue->last->next = node;
-	
-	readyQueue->last = node;
-	readyQueue->size++;
-	init_pcb(process, node, priority);
+	push_process(readyQueue, node);
+	init_pcb(process, node, priority, TRUE);
 	return 0;
 }
 
@@ -319,7 +371,12 @@ int switch_process(void)
 
 	state = curProcess->pcb.m_state;
 
-	if (state == NEW) {
+	if (curProcess->pcb.mp_sp == NULL) {
+		curProcess = oldProcess;
+		uart_put_string("Kernel Error: Attempt to switch to a process without a stack.\n\rProcess ID:\n\r");
+		uart_put_hex(curProcess->pcb.m_pid);
+		return -1;
+	} else if (state == NEW) {
 		if (oldProcess->pcb.m_state != NEW) {
 			oldProcess->pcb.mp_sp = (uint32_t *) __get_MSP();
 		}
@@ -333,8 +390,8 @@ int switch_process(void)
 	} else {
 		curProcess = oldProcess; /* revert back to the old proc on error */
 		uart_put_string("Kernel Error: Failed to switch process.\n\rProcess ID:\n\r");
-//		uart1_put_hex(curProcess->pcb.m_pid);
-		 return -1;
+		uart_put_hex(curProcess->pcb.m_pid);
+		return -1;
 	}
 	return 0;
 }
@@ -438,9 +495,8 @@ void k_dec_delay_msg_time(){
 	}
 }
 
-void timer_i_process(){
-		k_dec_delay_msg_time();
-		g_timer_count++ ;
+int get_system_pid(system_proc_type type){
+    return systemProcesses[type]->pcb.m_pid;
 }
 
 

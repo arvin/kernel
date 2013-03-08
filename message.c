@@ -41,6 +41,7 @@ MessageNode* pollMessageQueue(MessageQueue* queue) {
 
 // Add process to the back of the specified queue
 Message* removeMessage(MessageQueue* queue, int* sender_id) {
+	volatile MessageQueue* meh = queue;
 	while(1){
 		MessageNode* node = pollMessageQueue(queue);
 		if(node != NULL) {

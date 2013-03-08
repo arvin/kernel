@@ -1,7 +1,7 @@
 #ifndef _PROCESS_H_
 #define _PROCESS_H_
 
-#define USR_SZ_STACK 0x030
+#define USR_SZ_STACK 0x040
 
 #define NULL 0
 #define PRIORITY_COUNT 4
@@ -14,7 +14,7 @@
 /* process states, note we only assume three states in this example */
 typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT} proc_state_t;  
 
-typedef enum {TIMER = 0, UART} processType;
+typedef enum {TIMER = 0, UART, KCD, CRT, WALL_CLOCK} system_proc_type;
 
 /*
   PCB data structure definition.
@@ -25,7 +25,8 @@ typedef enum {TIMER = 0, UART} processType;
 typedef struct pcb PCB;
 
 typedef struct pcb { 
-  //struct pcb *mp_next;     /* next pcb, not used in this example, RTX project most likely will need it, keep here for reference */  
+  //struct pcb *mp_next;     /* next pcb, not used in this example, RTX project most likely will need it, keep here for reference */
+	uint32_t *stack_boundary;
   uint32_t *mp_sp;         /* stack pointer of the process */
   uint32_t m_pid;          /* process id */
   proc_state_t m_state;    /* state of the process */
@@ -46,7 +47,8 @@ typedef struct ProcessQueue {
 
 
 void process_init(void);    /* initialize all procs in the system */
-void init_pcb(void* process, ProcessNode* node, int priority);
+void init_pcb(void* process, ProcessNode* node, int priority, int isStackRequired);
+void init_proc_stack(void* process, ProcessNode* node);
 ProcessNode* scheduler(void);               /* pick the pid of the next to run process */
 int k_add_new_process(void*);
 int add_new_prioritized_process(void*, int priority);
@@ -68,5 +70,6 @@ void* k_receive_message(int* sender_id);
 void k_dec_delay_msg_time(void);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
 void timer_i_process(void);
-
+void display_time(void);
+int get_system_pid(system_proc_type type);
 #endif /* ! _PROCESS_H_ */

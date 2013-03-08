@@ -52,7 +52,8 @@ void proc1(void) {
 	msgNum =  (msg->data);
 	uart_put_int(*msgNum);
 	uart_put_string("\n\r\n\r");
-	
+	release_memory_block(msg->data);
+	release_memory_block(msg);
 	
 	do
 		release_processor();
@@ -123,6 +124,7 @@ void proc3(void){
 
 void proc4(void){
 	//Allocate to max and then deallocate all
+	/*
 	void** arr[3];
 	int i = 0;
 	int errorFlag = 0;
@@ -158,6 +160,7 @@ void proc4(void){
 	}
 	
 	proc4Stage++;
+	*/
 	do
 		release_processor();
 	while (true);
@@ -182,8 +185,6 @@ void proc5(void) {
 
 void proc6(void) {
 	int result;
-	
-	release_processor();
 	
 	result = set_process_priority(1, 2);
 	uart_put_string("Test 6a: Set priority to a valid number.\n\r");
