@@ -10,6 +10,7 @@ volatile uint32_t g_UART0_count = 0;
 volatile int read_command = FALSE;
 volatile uint8_t command_buffer[BUFSIZE];
 volatile uint32_t command_index = 0;
+volatile char* data_buff;
 /**
  * @brief: initialize the n_uart
  * NOTES: only fully supports uart0 so far, but can be easily extended 
@@ -207,37 +208,33 @@ void c_UART0_IRQHandler(void)
 	}	
 }
 
-void uart_i_process( uint8_t *p_buffer, uint32_t len )
-{
-	//keyboard input
-	//command reg
+void uart_i_process( uint8_t *p_buffer, uint32_t len ){
+
 	Message *inputMsg;
 	Message *cmdMsg;
+	char* inputData;
 	int i = 0;
 	int start = command_index;
-	char* inputData;
-	char* cmdData;
 	LPC_UART0->IER = IER_THRE | IER_RLS; 
 	g_UART0_count = 0;
 			
 			/* Re-enable RBR, THRE left as enabled */
 	
 	while ( len != 0 ) {
-		if(*p_buffer  == '%'){
+		if(*p_buffer  == '%' && !read_command){
 			read_command = TRUE;
-			command_index = 0;
-			command_buffer[command_index++] = *p_buffer;
+			command_index = 1;
+			data_buff = k_request_memory_block();
+			*data_buff = *p_buffer;
 		}else if(read_command == TRUE){
+			command_index=0;
 			if(command_index <BUFSIZE-1){
-				command_buffer[command_index++] = *p_buffer;
+				*(data_buff + command_index) = *p_buffer;
+				command_index++;
 			}else if(*p_buffer == '\r'){
-				command_buffer[command_index++] = '\0';
+				*(data_buff + 1) = '\0';
 				cmdMsg = (Message*)k_request_memory_block();
-				cmdData = k_request_memory_block();
-				for(i = 0;i<command_index;i++){
-				    *(cmdData+i) = command_buffer[i];
-        }
-				cmdMsg->data = cmdData;
+				cmdMsg->data = data_buff;
 				cmdMsg->type = COMMAND_REG;
 				cmdMsg->dest_pid = get_system_pid(KCD);
 				cmdMsg->sender_pid = get_system_pid(UART);
@@ -247,21 +244,12 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len )
 			}
 		}else{	
 			inputMsg = (Message*)k_request_memory_block();
-			inputData = k_request_memory_block();
-			*(inputData) = *p_buffer;
-			inputMsg->data = inputData;
+			inputMsg->data = data_buff;
 			inputMsg->type = KEYBOARD_INPUT;
 			inputMsg->dest_pid = get_system_pid(KCD);
 			inputMsg->sender_pid = get_system_pid(UART);
 			send_msg(get_system_pid(KCD), inputMsg, 0);
-			/*
-			while ( !(g_UART0_TX_empty & 0x01) );	
-			pUart->THR = *p_buffer;
-			*(data++) = *p_buffer; 
-			g_UART0_TX_empty = 0;  // not empty in the THR until it shifts out
-			p_buffer++;
-			len--;
-			*/
+
 			
 	  }
 		p_buffer++;
@@ -270,12 +258,13 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len )
 			
   if (read_command == TRUE) {
 		inputMsg = (Message*)k_request_memory_block();
-		inputData = k_request_memory_block();
-		for(i = start;i<command_index;i++){
-			*(inputData+i) = command_buffer[i];
-    }
-		*(inputData+i) = '\0';  
+		inputData = (char*)k_request_memory_block();
+		*(data_buff + command_index) = '\0';
+		for(i = 0; i <= command_index; i++){
+			*(inputData + i) = *(data_buff + i);
+		}
 		inputMsg->data = inputData;
+
 		inputMsg->type = CRT_DISPLAY;
 		inputMsg->dest_pid = get_system_pid(CRT);
 		inputMsg->sender_pid = get_system_pid(UART);
