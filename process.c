@@ -35,8 +35,8 @@ void keyboard_proc(void){
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 
-			k_release_memory_block(msg->data);
-			k_release_memory_block(msg);
+			release_memory_block(msg->data);
+			release_memory_block(msg);
 		}
 }
 
@@ -51,8 +51,8 @@ void crt_proc(){
 			msgData =  (msg->data);
 			uart_put_string(msgData);
 		}
-		k_release_memory_block(msg->data);
-		k_release_memory_block(msg);
+		release_memory_block(msg->data);
+		release_memory_block(msg);
 	}
 }
 
@@ -289,6 +289,7 @@ int k_release_processor(proc_state_t newState) {
 			break;
 	}
 	switch_process();
+	print_process();
 	return 0;
 }
 
@@ -497,6 +498,49 @@ void k_dec_delay_msg_time(){
 
 int get_system_pid(system_proc_type type){
     return systemProcesses[type]->pcb.m_pid;
+}
+
+void print_process(){
+	/*
+	int i = 0;
+	ProcessNode* curr;
+	Print all processes on ready queue
+	uart_put_string("Ready Queue:\n\r");
+	
+	curr = readyQueue->first;
+	while(curr!=NULL){
+		uart_put_string("\r PID: ");
+		uart_put_int(curr->pcb.m_pid);
+		uart_put_string("\r Priority: ");
+		uart_put_int(curr->pcb.priority);
+		uart_put_string("\n");
+		curr = curr->next;
+	}
+	//Print all processes on blocked queue
+	uart_put_string("Blocked Memory Queue:\n");
+	for (i = 0; i < PRIORITY_COUNT; ++i){
+		curr = blockedQueues[i]->first;
+		while(curr!=NULL){
+			uart_put_string("\r PID: ");
+			uart_put_int(curr->pcb.m_pid);
+			uart_put_string("\r Priority: ");
+			uart_put_int(curr->pcb.priority);
+			uart_put_string("\n");
+			curr = curr->next;
+		}
+	}
+	//Print all processes on blocked msg queue
+	uart_put_string("Blocked Receive Queue Queue:\n");
+	curr = blockedMsgQueues->first;
+	while(curr!=NULL){
+		uart_put_string("\r PID: ");
+		uart_put_int(curr->pcb.m_pid);
+		uart_put_string("\r Priority: ");
+		uart_put_int(curr->pcb.priority);
+		uart_put_string("\n");
+		curr = curr->next;
+	}
+	*/
 }
 
 

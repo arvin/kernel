@@ -72,4 +72,5 @@ int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
 void timer_i_process(void);
 void display_time(void);
 int get_system_pid(system_proc_type type);
+void print_process(void);
 #endif /* ! _PROCESS_H_ */
