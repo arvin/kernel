@@ -256,11 +256,11 @@ void proc6(void){
 		uart_put_string("\n");
 		
 	 if(msg->type == COMMAND){
-			if(string_equals(msg_data, "%WR")){
+			if(string_equals(message_data, "%WR")){
 					
-			}else if(string_equals(msg_data, "%WS")){
+			}else if(string_equals(message_data, "%WS")){
 				
-			}else if(string_equals(msg_data, "%WT")){
+			}else if(string_equals(message_data, "%WT")){
 				
 			}
 	}

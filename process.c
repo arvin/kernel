@@ -22,6 +22,14 @@ int newProcessId = 0;				/* Must be unique */
 int g_timer_count = 0;
 int start_clk = FALSE;
 int wall_clk_handler = 0;
+int index_to_cmd_arr = 0;
+
+typedef struct cmd { 
+	char* cmd_name;
+	int to_pid;
+} cmd_t;
+
+cmd_t* cmd_arr[6];
 
 void null_process(void) {
 	while(1) {
@@ -550,6 +558,17 @@ int k_get_system_pid(system_proc_type type){
     return systemProcesses[type]->pcb.m_pid;
 }
 
+int add_command_to_proc(char* proc_cmd, int to_pid){
+	if(index_to_cmd_arr >5){
+		release_memory_block(proc_cmd);
+		return -1;
+	}
+	cmd_t *node = (cmd_t*)k_request_memory_block();
+	node->to_pid = to_pid;
+	node->cmd_name = proc_cmd;
+	cmd_arr[index_to_cmd_arr++] = node;
+	return 0;
+}
 
 void print_process(){
 	/*
