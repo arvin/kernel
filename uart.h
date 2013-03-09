@@ -65,9 +65,8 @@ void uart_put_hex(int val);
 void uart_put_int(int val);
 //void k_uart_i_process(void);
 
-extern void k_uart_i_process(void);
-#define uart_i_process() _uart_i_process((U32)k_uart_i_process)
-void _uart_i_process(U32 p_func) __SVC_0;
+void trigger_uart_i_process(void);
+void uart_i_process(void);
 
 //void uart_i_process(uint8_t *p_buffer, uint32_t len);
 #endif /* ! _UART_H_ */

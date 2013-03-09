@@ -340,9 +340,6 @@ void proc6(void){
 		release_memory_block(msg->data);
 		release_memory_block(msg);
 	}
-	do
-		release_processor();
-	while (true);
 	
 }
 

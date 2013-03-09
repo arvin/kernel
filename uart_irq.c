@@ -170,8 +170,9 @@ void c_UART0_IRQHandler(void)
 		g_UART0_buffer[g_UART0_count++] = pUart->RBR;
 		if (g_UART0_count == BUFSIZE) {
 			g_UART0_count = 0; /* buffer overflow */
-		}		
-		k_uart_i_process();
+		}
+		
+		trigger_uart_i_process();
 	} else if (IIR_IntId & IIR_THRE) { 
 		/* THRE Interrupt, transmit holding register empty*/
 		
@@ -202,14 +203,25 @@ void c_UART0_IRQHandler(void)
 				g_UART0_count = 0;  /* buffer overflow */
 			}	
 
-			k_uart_i_process();
+			trigger_uart_i_process();
 		}	    
 	} else { /* IIR_CTI and reserved combination are not implemented */
 		return;
 	}	
 }
 
-void k_uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
+void trigger_uart_i_process() {
+	set_process_state(get_current_process_id(), INTERRUPTED);
+	set_process_state(k_get_system_pid(UART), RUN);
+	
+	uart_i_process();
+	
+	set_process_state(k_get_system_pid(UART), WAIT_FOR_INTERRUPT);
+	set_process_state(get_current_process_id(), RUN);
+	
+}
+
+void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 	uint8_t *p_buffer = (uint8_t *)g_UART0_buffer;
 	uint32_t len =  g_UART0_count;
 	Message *inputMsg;
@@ -218,8 +230,6 @@ void k_uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 	unsigned char* msgData;
 	char* inputData;
 	char* crtData;
-	int i = 0;
-	
 			
 			/* Re-enable RBR, THRE left as enabled */
   receivedMsg =	(Message*)system_proc_receive_message(UART);

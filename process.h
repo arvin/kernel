@@ -69,10 +69,10 @@ void* k_receive_message(int* sender_id);
 void* system_proc_receive_message(system_proc_type type);
 void k_dec_delay_msg_time(void);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
-void timer_i_process(void);
 void k_display_time(void);
 int k_get_system_pid(system_proc_type type);
-void k_set_timer_count(int time);
 void print_process(void);
+uint32_t get_current_process_id(void);
+void set_process_state(uint32_t process_ID, proc_state_t state);
 
 #endif /* ! _PROCESS_H_ */
