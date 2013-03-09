@@ -77,4 +77,5 @@ void eos(char* block);
 void clear(char* block);
 uint32_t get_current_process_id(void);
 void set_process_state(uint32_t process_ID, proc_state_t state);
+void clearString(char* str);
 #endif /* ! _PROCESS_H_ */

@@ -30,6 +30,7 @@ void null_process(void) {
 
 void keyboard_proc(void){
     Message *msg;
+		int hot_key;
 		char* msg_data;
 	  int sender_id = get_system_pid(KCD); //random id;
 	  while(1){
@@ -55,7 +56,7 @@ void keyboard_proc(void){
 					}
 				} 
 			}else if(msg->type == KEYBOARD_INPUT){
-				if(string_equals(msg_data, "!") || string_equals(msg_data, "!\0")){
+				if(string_equals(msg_data, "!")){
 					print_process();
 					release_memory_block(msg_data);
 					release_memory_block(msg);
@@ -599,24 +600,31 @@ void print_process(){
 	}
 	
 	if(anyBlockedQueues == 0){
-		str = ("No Blocked Queue's!\n\r\n\r");
+		str = ("No Blocked Queues!\n\r\n\r");
 		data = append_to_block((char*)data,(char*)str);
 	}
 	eos((char*)data);
 	
 	
 	
-		str = ("Blocked Receive Queue Queue:\n\r");
+		str = ("Blocked Msg Queue:\n\r");
 		data2 = append_to_block((char*)data2,(char*)str);
 		str = "       \n\r";
 		
 		curr = blockedMsgQueues->first;
 		while(curr!=NULL){
+				clearString(str);
 				anyBlockedRecieveQueues = 1;
 				data2 = append_to_block((char*)data2, "\r PID: ");
-				*str = curr->pcb.m_pid + '0';
+				if (curr->pcb.m_pid >= 10){
+					*(str) = curr->pcb.m_pid / 10 + '0';
+					*(str+1) = curr->pcb.m_pid % 10 + '0';
+				}else{
+					*str = curr->pcb.m_pid % 10 + '0';
+				}
 				data2 = append_to_block(data2, str); //Note might have to double check in case it's 2 digit
 				data2 = append_to_block((char*)data2, "\r Priority: ");
+				clearString(str);
 				*str = curr->pcb.priority + '0';
 				data2 = append_to_block((char*)data2, str);
 				data2 = append_to_block((char*)data2, "\n");
@@ -696,5 +704,10 @@ char* append_to_block(char* block, char* str){
 
 void eos(char* block){
 	*(block++) = '\0';
+}
 
+void clearString(char* str){
+	while(*str != '\0' && *str != '\n'){
+		*(str++) = ' ';
+	}
 }
