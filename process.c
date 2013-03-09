@@ -4,6 +4,7 @@
 #include "userproc.h"
 #include "rtx.h"
 #include "lib.h"
+#include "timer.h"
 
 #ifdef DEBUG_0
 #include <stdio.h>
@@ -15,13 +16,10 @@ ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
 
-pcb_t* procArr[12];
-ProcessNode* systemProcesses[5];
+pcb_t* procArr[11];
+ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
-int g_timer_count = 0;
-int start_clk = FALSE;
-int wall_clk_handler = 0;
 
 void null_process(void) {
 	while(1) {
@@ -33,10 +31,7 @@ void null_process(void) {
 void keyboard_proc(void){
     Message *msg;
 		char* msg_data;
-	  int sender_id = k_get_system_pid(KCD); //random id;
-	  char curChar;
-	  int hot_key = 0;
-	  int read_input = 0;
+	  int sender_id = get_system_pid(KCD); //random id;
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 			msg_data = (char*) msg->data;
@@ -44,16 +39,16 @@ void keyboard_proc(void){
 			//Check the contents of the message
 			if(msg->type == COMMAND_REG){
 				if(string_equals(msg_data, "%W")){
-					wall_clk_handler = msg->sender_pid;
+					set_wall_clk_handler(msg->sender_pid);
 					release_memory_block(msg_data);
 					release_memory_block(msg);
 				}
 			}else if(msg->type == COMMAND){
-				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || string_equals(msg_data, "%WS")){
-					if(wall_clk_handler != 0){
-							msg->sender_pid = k_get_system_pid(KCD);
-							msg->dest_pid = wall_clk_handler;
-							send_message(wall_clk_handler, msg);
+				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || (contains_prefix(msg_data, "%WS"))){
+					if(get_wall_clk_handler() != 0){
+							msg->sender_pid = get_system_pid(KCD);
+							msg->dest_pid = get_wall_clk_handler();
+							send_message(get_wall_clk_handler(), msg);
 					}else{
 						release_memory_block(msg_data);
 						release_memory_block(msg);
@@ -78,6 +73,8 @@ void crt_proc(){
 	while(1) {
 		msg = (Message*)receive_message(& sender_id);
 		if(msg->type == CRT_DISPLAY){
+			//send_message(get_system_pid(UART), msg);
+			//k_uart_i_process();
 			msgData =  (msg->data);
 			uart_put_string(msgData);
 		}
@@ -87,42 +84,29 @@ void crt_proc(){
 }
 
 
-
-void timer_i_process(){
-		k_dec_delay_msg_time();
-		g_timer_count++ ;
-		if(start_clk){
-			
-		}
-		g_timer_count %= 3600*24*1000;
-}
-
-
-void display_time(){
-		Message* msg;
-		int sender_id;
-  	int count;
-  	int hh;
-  	int mm;
-  	int ss;
+void k_display_time(){
+		int count = get_timer() / 1000;
+		char* data = (char*)k_request_memory_block();
+		Message* crt_message = (Message*)k_request_memory_block();
+		crt_message->type = CRT_DISPLAY;
+		crt_message->dest_pid = k_get_system_pid(CRT);
+		crt_message->sender_pid = get_current_process_id();
+		crt_message->data = (void*)data;
 	
-		while(1) {
-			msg = (Message*)receive_message(& sender_id);
-			
-			count = g_timer_count / 1000;
-			hh = count/3600;
-			mm = (count/60)%60;
-			ss = count%60;
-			uart_put_int(hh);
-			uart_put_char(':');
-			uart_put_int(mm);
-			uart_put_char(':');
-			uart_put_int(ss);
-			uart_put_string("\n");
-			
-			k_release_memory_block(msg->data);
-			k_release_memory_block(msg);
-		}
+		*(data++) = '\r';
+		*(data++) = (count/3600) / 10 + '0';
+		*(data++) = (count/3600) % 10 + '0';
+		*(data++) = ':';
+		*(data++) = ((count/60)%60) / 10 + '0';
+		*(data++) = ((count/60)%60) % 10 + '0';
+		*(data++) = ':';
+		*(data++) = (count%60) / 10 + '0';
+		*(data++) = (count%60) % 10 + '0';
+		*(data++) = '\r';
+		*(data++) = '\0';
+	
+		send_msg(k_get_system_pid(CRT), crt_message, 0);
+
 }
 
 
@@ -168,9 +152,11 @@ void process_init() {
 	//Interrupt process initialization
 	systemProcesses[TIMER] = (ProcessNode*)k_request_memory_block();
 	init_pcb(&timer_i_process, systemProcesses[TIMER], 3, FALSE);
+	systemProcesses[TIMER]->pcb.m_state = WAIT_FOR_INTERRUPT;
 	
 	systemProcesses[UART] = (ProcessNode*)k_request_memory_block();
 	init_pcb(&uart_i_process, systemProcesses[UART], 3, FALSE);
+	systemProcesses[UART]->pcb.m_state = WAIT_FOR_INTERRUPT;
 	
 	// System process initialization
 	systemProcesses[KCD] = (ProcessNode*)k_request_memory_block();
@@ -181,9 +167,6 @@ void process_init() {
 	init_pcb(&crt_proc, systemProcesses[CRT], 0, TRUE);
 	push_process(readyQueue, systemProcesses[CRT]);
 	
-	systemProcesses[WALL_CLOCK] = (ProcessNode*)k_request_memory_block();
-	init_pcb(&display_time, systemProcesses[WALL_CLOCK], 0, TRUE);
-	push_process(readyQueue, systemProcesses[WALL_CLOCK]);
 }
 
 
@@ -504,7 +487,12 @@ int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
 
 
 void* k_receive_message(int* sender_id) {
-    return removeMessage(&(curProcess->pcb.msgQueue), sender_id);
+    return removeMessage(&(curProcess->pcb.msgQueue), sender_id, 1);
+}
+
+void* system_proc_receive_message(system_proc_type type){
+		int sender_id;
+    return removeMessage(&(systemProcesses[type]->pcb.msgQueue), &sender_id, 0);
 }
 
 
@@ -551,9 +539,16 @@ void k_dec_delay_msg_time(){
 
 
 int k_get_system_pid(system_proc_type type){
-    return systemProcesses[type]->pcb.m_pid;
+  return systemProcesses[type]->pcb.m_pid;
 }
 
+uint32_t get_current_process_id() {
+	return curProcess ? curProcess->pcb.m_pid : 0;
+}
+
+void set_process_state(uint32_t process_ID, proc_state_t state) {
+	procArr[process_ID]->m_state = state;
+}
 
 void print_process(){
 		Message* crt_message = (Message*)request_memory_block();

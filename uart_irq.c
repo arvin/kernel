@@ -159,6 +159,7 @@ void c_UART0_IRQHandler(void)
 	uint8_t IIR_IntId;      /* Interrupt ID from IIR */		
 	uint8_t LSR_Val;        /* LSR Value             */
 	uint8_t dummy = dummy;	/* to clear interrupt upon LSR error */
+	
 	LPC_UART_TypeDef *pUart = (LPC_UART_TypeDef *)LPC_UART0;
 
 	/* Reading IIR automatically acknowledges the interrupt */
@@ -169,8 +170,9 @@ void c_UART0_IRQHandler(void)
 		g_UART0_buffer[g_UART0_count++] = pUart->RBR;
 		if (g_UART0_count == BUFSIZE) {
 			g_UART0_count = 0; /* buffer overflow */
-		}		
-		uart_i_process((uint8_t *)g_UART0_buffer, g_UART0_count);
+		}
+		
+		trigger_uart_i_process();
 	} else if (IIR_IntId & IIR_THRE) { 
 		/* THRE Interrupt, transmit holding register empty*/
 		
@@ -201,100 +203,118 @@ void c_UART0_IRQHandler(void)
 				g_UART0_count = 0;  /* buffer overflow */
 			}	
 
-			uart_i_process((uint8_t *)g_UART0_buffer, g_UART0_count);
+			trigger_uart_i_process();
 		}	    
 	} else { /* IIR_CTI and reserved combination are not implemented */
 		return;
 	}	
 }
 
-void uart_i_process( uint8_t *p_buffer, uint32_t len ){
+void trigger_uart_i_process() {
+	set_process_state(get_current_process_id(), INTERRUPTED);
+	set_process_state(k_get_system_pid(UART), RUN);
+	
+	uart_i_process();
+	
+	set_process_state(k_get_system_pid(UART), WAIT_FOR_INTERRUPT);
+	set_process_state(get_current_process_id(), RUN);
+	
+}
 
+void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
+	uint8_t *p_buffer = (uint8_t *)g_UART0_buffer;
+	uint32_t len =  g_UART0_count;
 	Message *inputMsg;
 	Message *cmdMsg;
+	Message *receivedMsg;
+	unsigned char* msgData;
 	char* inputData;
 	char* crtData;
-	int i = 0;
-	LPC_UART0->IER = IER_THRE | IER_RLS; 
-	g_UART0_count = 0;
 			
 			/* Re-enable RBR, THRE left as enabled */
+  receivedMsg =	(Message*)system_proc_receive_message(UART);
+	if(receivedMsg) {
+		
+		msgData = (char*) (receivedMsg->data);
+		uart_put_string(msgData);
+		release_memory_block(receivedMsg);
+		release_memory_block(receivedMsg->data);
+	}
+	else{
+		LPC_UART0->IER = IER_THRE | IER_RLS; 
+		g_UART0_count = 0;
+		while ( len != 0 ) {
+			if(*p_buffer  == '%' && !read_command){
+				read_command = TRUE;
+				command_index = 1;
+				data_buff = k_request_memory_block();
+				*data_buff = *p_buffer;
+			}else if(read_command == TRUE){
+				if(command_index <BUFSIZE-1){
+					
+					if(*p_buffer == (char)13){
+						
+						cmdMsg = (Message*)k_request_memory_block();
+						cmdMsg->data = data_buff;
+						cmdMsg->type = COMMAND;
+						cmdMsg->dest_pid = k_get_system_pid(KCD);
+						cmdMsg->sender_pid = k_get_system_pid(UART);
+						send_msg(k_get_system_pid(KCD), cmdMsg, 0);
+						*(data_buff + command_index) = '\0';
+						
+						
+						inputMsg = (Message*)k_request_memory_block();
+						crtData = (char*)k_request_memory_block();
+						*crtData = '\r';
+						*(crtData+1) = '\n';
+						*(crtData+2) = '\0';
+						inputMsg->data = crtData;
+						inputMsg->type = CRT_DISPLAY;
+						inputMsg->dest_pid = k_get_system_pid(CRT);
+						inputMsg->sender_pid = k_get_system_pid(UART);
+						send_msg(k_get_system_pid(CRT), inputMsg, 0);
 	
-	while ( len != 0 ) {
-		if(*p_buffer  == '%' && !read_command){
-			read_command = TRUE;
-			command_index = 1;
-			data_buff = k_request_memory_block();
-			*data_buff = *p_buffer;
-		}else if(read_command == TRUE){
-			if(command_index <BUFSIZE-1){
-				
-				if(*p_buffer == (char)13){
-				//	*(data_buff + 1) = '\0';
-					cmdMsg = (Message*)k_request_memory_block();
-					cmdMsg->data = data_buff;
-					cmdMsg->type = COMMAND;
-					cmdMsg->dest_pid = k_get_system_pid(KCD);
-					cmdMsg->sender_pid = k_get_system_pid(UART);
-					send_msg(k_get_system_pid(KCD), cmdMsg, 0);
-					
-					
-					inputMsg = (Message*)k_request_memory_block();
-					inputData = (char*)k_request_memory_block();
-					*(data_buff + command_index) = '\0';
-					for(i = 0; i <= command_index; i++){
-						*(inputData + i) = *(data_buff + i);
+
+						
+						read_command = FALSE;
+						command_index = 0;
+						
+					}else{
+						*(data_buff + command_index) = *p_buffer;
+						command_index++;
 					}
-					inputMsg->data = inputData;
-
-					inputMsg->type = CRT_DISPLAY;
-					inputMsg->dest_pid = k_get_system_pid(CRT);
-					inputMsg->sender_pid = k_get_system_pid(UART);
-					send_msg(k_get_system_pid(CRT), inputMsg, 0);
-					
-					read_command = FALSE;
-					command_index = 0;
-					
-				}else{
-					*(data_buff + command_index) = *p_buffer;
-					command_index++;
 				}
+			}else{	
+				inputMsg = (Message*)k_request_memory_block();
+
+				inputData = (char*)k_request_memory_block();
+				*inputData = *p_buffer;
+				inputMsg->data = inputData;
+				inputMsg->type = KEYBOARD_INPUT;
+				inputMsg->dest_pid = k_get_system_pid(KCD);
+				inputMsg->sender_pid = k_get_system_pid(UART);
+				send_msg(k_get_system_pid(KCD), inputMsg, 0);
 			}
-		}else{	
+			p_buffer++;
+			len--;
+		}
+				
+		if (read_command == TRUE) {
 			inputMsg = (Message*)k_request_memory_block();
+			crtData = (char*)k_request_memory_block();
+			//*(data_buff + command_index) = '\0';
+			*crtData = *(data_buff+command_index-1);
+			*(crtData + 1) = '\0';
+			inputMsg->data = crtData;
 
-			inputData = (char*)k_request_memory_block();
-			*inputData = *p_buffer;
-			*(inputData + 1) = '\0';
-			inputMsg->data = inputData;
-			inputMsg->type = KEYBOARD_INPUT;
-			inputMsg->dest_pid = k_get_system_pid(KCD);
+			inputMsg->type = CRT_DISPLAY;
+			inputMsg->dest_pid = k_get_system_pid(CRT);
 			inputMsg->sender_pid = k_get_system_pid(UART);
-			send_msg(k_get_system_pid(KCD), inputMsg, 0);
-	  }
-		p_buffer++;
-	  len--;
-  }
-			
-  if (read_command == TRUE) {
-		inputMsg = (Message*)k_request_memory_block();
-		crtData = (char*)k_request_memory_block();
-		//*(data_buff + command_index) = '\0';
-		*crtData = *(data_buff+command_index-1);
-		*(crtData + 1) = '\0';
-		inputMsg->data = crtData;
-
-		inputMsg->type = CRT_DISPLAY;
-		inputMsg->dest_pid = k_get_system_pid(CRT);
-		inputMsg->sender_pid = k_get_system_pid(UART);
-		send_msg(k_get_system_pid(CRT), inputMsg, 0);
-	}		
-
-
+			send_msg(k_get_system_pid(CRT), inputMsg, 0);
+		}		
+		LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR;
+	}
 	
-	
-	LPC_UART0->IER = IER_THRE | IER_RLS | IER_RBR;
-	return;
 }
 
 int uart_put_string(unsigned char *s)
@@ -334,6 +354,10 @@ void uart_put_int(int val) {
 	int i;
 	int temp;
 	int original;
+	if (val == 0) {
+		uart_put_char('0');
+		return;
+	}
 	if (val < 0) {
 		val = -val;
 		uart_put_char('-');

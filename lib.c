@@ -11,7 +11,6 @@ int string_equals(char* a, char* b){
 	return (*a == '\0' && *b == '\0');
 }
 
-
 int size(char *ptr)
 {
     //variable used to access the subsequent array elements.
@@ -29,4 +28,25 @@ int size(char *ptr)
     }
     //return the size of the array
     return count;
+}
+
+int contains_prefix(char*a, char* pre){
+	while(*pre != '\0'){
+		if(*a != *pre)
+			return FALSE;
+		a++;
+		pre++;
+	}
+	return TRUE;
+}
+
+void* string_copy(void* target, char* s) {
+	char* t = (char*)target;
+	while (*s != '\0') {
+		*t = *s;
+		t++;
+		s++;
+	}
+	*t = '\0';
+	return target;
 }

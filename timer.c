@@ -10,6 +10,10 @@
 #include "timer.h"
 #include "process.h"
 #include "uart.h"
+#include "rtx.h"
+
+int g_timer_count = 0;
+uint32_t wall_clk_handler = 0;
 
 /**
  * @brief: initialize timer. Only timer 0 is supported
@@ -107,11 +111,47 @@ __asm void TIMER0_IRQHandler(void)
  */
 void c_TIMER0_IRQHandler(void)
 {
-	/* ack inttrupt, see section  21.6.1 on pg 493 of LPC17XX_UM */
-	//k_release_processor(INTERRUPT_TIMER);
-	timer_i_process();
-	LPC_TIM0->IR = BIT(0);
-	
-	
+	trigger_timer_i_process();
+	LPC_TIM0->IR = BIT(0);	
 }
 
+void trigger_timer_i_process() {
+	set_process_state(get_current_process_id(), INTERRUPTED);
+	set_process_state(k_get_system_pid(TIMER), RUN);
+	
+	timer_i_process();
+	
+	set_process_state(k_get_system_pid(TIMER), WAIT_FOR_INTERRUPT);
+	set_process_state(get_current_process_id(), RUN);
+}
+
+void timer_i_process() {
+		Message *new_Message;
+		k_dec_delay_msg_time();
+		g_timer_count++ ;
+		g_timer_count %= 3600*24*1000;
+		if(start_clk && (g_timer_count%1000 == 0)){
+				new_Message = (Message*) k_request_memory_block();
+				new_Message->sender_pid = k_get_system_pid(TIMER);
+				new_Message->dest_pid = wall_clk_handler;
+				new_Message->type = DISPLAY_TIME;
+				new_Message->data = NULL;
+			  k_send_message(wall_clk_handler, new_Message);
+		}
+}
+
+uint32_t get_wall_clk_handler(void) {
+	return wall_clk_handler;
+}
+
+void set_wall_clk_handler(uint32_t pid) {
+	wall_clk_handler = pid;
+}
+
+void k_set_timer_count(int time){
+	g_timer_count = time;
+}
+
+int get_timer() {
+	return g_timer_count;
+}

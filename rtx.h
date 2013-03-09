@@ -11,6 +11,7 @@ typedef unsigned int U32;
 // User Defined Variables
 extern int ProcessCount;
 extern void* ProcessTable[];
+extern int start_clk;
 
 // User API
 
@@ -21,9 +22,9 @@ typedef struct Message{
 	  void* data;
 }Message;
 
-typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND} msg_type;
+typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND, DISPLAY_TIME} msg_type;
 
-typedef enum {TIMER = 0, UART, KCD, CRT, WALL_CLOCK} system_proc_type;
+typedef enum {TIMER = 0, UART, KCD, CRT} system_proc_type;
 
 
 #define __SVC_0  __svc_indirect(0)
@@ -67,5 +68,14 @@ int _dec_delay_msg_time(U32 p_func) __SVC_0;
 extern int k_get_system_pid(system_proc_type type);
 #define get_system_pid(type) _get_system_pid((U32)k_get_system_pid, type)
 int _get_system_pid(U32 p_func, system_proc_type type) __SVC_0;
+
+extern void k_display_time(void);
+#define display_time() _display_time((U32)k_display_time)
+void _display_time(U32 p_func) __SVC_0;
+
+extern void k_set_timer_count(int time);
+#define set_timer_count(time) _set_timer_count((U32)k_set_timer_count, time)
+void _set_timer_count(U32 p_func, int time) __SVC_0;
+
 
 #endif /* !_RTX_H_ */

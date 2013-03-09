@@ -12,7 +12,8 @@
 #include "message.h"
 
 /* process states, note we only assume three states in this example */
-typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, WAIT_FOR_INTERRUPT} proc_state_t;  
+typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, WAIT_FOR_INTERRUPT, INTERRUPTED} proc_state_t;  
+
 
 /*
   PCB data structure definition.
@@ -65,13 +66,15 @@ extern void __rte(void);           /* pop exception stack frame */
 int k_send_message(int process_ID, void *messageEnvelope);
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 void* k_receive_message(int* sender_id);
+void* system_proc_receive_message(system_proc_type type);
 void k_dec_delay_msg_time(void);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
-void timer_i_process(void);
-void display_time(void);
+void k_display_time(void);
 int k_get_system_pid(system_proc_type type);
 void print_process(void);
 char* append_to_block(char* block, char* str);
 void eos(char* block);
 void clear(char* block);
+uint32_t get_current_process_id(void);
+void set_process_state(uint32_t process_ID, proc_state_t state);
 #endif /* ! _PROCESS_H_ */
