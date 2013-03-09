@@ -45,7 +45,7 @@ void keyboard_proc(void){
 					release_memory_block(msg);
 				}
 			}else if(msg->type == COMMAND){
-				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || string_equals(msg_data, "%WS")){
+				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || (contains_prefix(msg_data, "%WS"))){
 					if(wall_clk_handler != 0){
 							msg->sender_pid = k_get_system_pid(KCD);
 							msg->dest_pid = wall_clk_handler;

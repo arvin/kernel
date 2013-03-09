@@ -3,45 +3,11 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
-N:\kernel\Lab1.uvproj
-Project File Date:  03/08/2013
+N:\kernel\kernel\Lab1.uvproj
+Project File Date:  03/09/2013
 
 <h2>Output:</h2>
-Load "N:\\kernel\\Lab1.AXF" 
-_____^
-*** error 56: cannot open file
-Rebuild target 'HelloWorld SIM'
-assembling startup_LPC17xx.s...
-compiling system_LPC17xx.c...
-compiling main.c...
-compiling process.c...
-lib.h(6): warning:  #1-D: last line of file ends without a newline
-process.c(117): warning:  #188-D: enumerated type mixed with another type
-process.c(110): warning:  #177-D: variable "val" was declared but never referenced
-compiling userproc.c...
-userproc.c(259): warning:  #223-D: function "string_equals" declared implicitly
-userproc.c(277): warning:  #128-D: loop is not reachable
-compiling HAL.c...
-compiling memory.c...
-compiling message.c...
-message.c(44): warning:  #177-D: variable "meh" was declared but never referenced
-compiling timer.c...
-compiling uart_irq.c...
-uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
-uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
-compiling atomic.c...
-compiling lib.c...
-lib.h(6): warning:  #1-D: last line of file ends without a newline
-linking...
-Program Size: Code=6224 RO-data=388 RW-data=112 ZI-data=824  
-"Lab1.axf" - 0 Error(s), 9 Warning(s).
-Load "N:\\kernel\\Lab1.AXF" 
-No Algorithm found for: 10000000H - 10001A3FH
-Partial Erase Done (areas with no algorithms skipped!)
-No Algorithm found for: 10000000H - 10001A3FH
-Partial Programming Done (areas with no algorithms skipped!)
-Partial Verify OK (areas with no algorithms skipped!)
-Rebuild target 'HelloWorld SIM'
+Build target 'HelloWorld SIM'
 assembling startup_LPC17xx.s...
 compiling system_LPC17xx.c...
 compiling main.c...
@@ -66,10 +32,363 @@ lib.h(6): warning:  #1-D: last line of file ends without a newline
 linking...
 Program Size: Code=6212 RO-data=388 RW-data=112 ZI-data=824  
 "Lab1.axf" - 0 Error(s), 9 Warning(s).
-Load "N:\\kernel\\Lab1.AXF" 
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
 No Algorithm found for: 10000000H - 10001A33H
 Partial Erase Done (areas with no algorithms skipped!)
 No Algorithm found for: 10000000H - 10001A33H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+linking...
+Program Size: Code=6256 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A5FH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A5FH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+linking...
+Program Size: Code=6180 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A13H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A13H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+linking...
+Program Size: Code=6116 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 100019D3H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 100019D3H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+linking...
+Program Size: Code=6212 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A33H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A33H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+linking...
+Program Size: Code=6184 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A17H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A17H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+linking...
+Program Size: Code=6176 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A0FH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A0FH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+linking...
+Program Size: Code=6176 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 0 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A0FH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A0FH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+linking...
+Program Size: Code=6176 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 0 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A0FH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A0FH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+linking...
+Program Size: Code=6184 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A17H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A17H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+linking...
+Program Size: Code=6192 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001A1FH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001A1FH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+userproc.c(287): warning:  #223-D: function "string_equals" declared implicitly
+userproc.c(292): error:  #20: identifier "time" is undefined
+userproc.c(314): warning:  #128-D: loop is not reachable
+Target not created
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+userproc.c(288): warning:  #223-D: function "string_equals" declared implicitly
+userproc.c(315): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6372 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(316): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6372 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001AD3H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001AD3H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(315): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6372 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001AD3H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001AD3H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(319): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6396 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001AEBH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001AEBH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling process.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+process.c(115): warning:  #188-D: enumerated type mixed with another type
+process.c(108): warning:  #177-D: variable "val" was declared but never referenced
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(321): warning:  #128-D: loop is not reachable
+compiling lib.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+lib.c(22): warning:  #1-D: last line of file ends without a newline
+linking...
+Program Size: Code=6440 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 7 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001B17H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001B17H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(317): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6416 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001AFFH
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001AFFH
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(318): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6424 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001B07H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001B07H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(255): error:  #20: identifier "received_msg_data" is undefined
+userproc.c(333): warning:  #128-D: loop is not reachable
+Target not created
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(333): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6500 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001B53H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001B53H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling userproc.c...
+lib.h(6): warning:  #1-D: last line of file ends without a newline
+userproc.c(334): warning:  #128-D: loop is not reachable
+linking...
+Program Size: Code=6500 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 2 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001B53H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001B53H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Rebuild target 'HelloWorld SIM'
+assembling startup_LPC17xx.s...
+compiling system_LPC17xx.c...
+compiling main.c...
+compiling process.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+process.c(115): warning:  #188-D: enumerated type mixed with another type
+process.c(108): warning:  #177-D: variable "val" was declared but never referenced
+compiling userproc.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+userproc.c(322): warning:  #223-D: function "k_request_memory_block" declared implicitly
+userproc.c(326): warning:  #188-D: enumerated type mixed with another type
+userproc.c(343): warning:  #128-D: loop is not reachable
+compiling HAL.c...
+compiling memory.c...
+compiling message.c...
+message.c(44): warning:  #177-D: variable "meh" was declared but never referenced
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+compiling atomic.c...
+compiling lib.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+linking...
+Program Size: Code=6612 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 12 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001BC3H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001BC3H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Rebuild target 'HelloWorld SIM'
+assembling startup_LPC17xx.s...
+compiling system_LPC17xx.c...
+compiling main.c...
+compiling process.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+process.c(115): warning:  #188-D: enumerated type mixed with another type
+process.c(108): warning:  #177-D: variable "val" was declared but never referenced
+compiling userproc.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+userproc.c(326): warning:  #188-D: enumerated type mixed with another type
+userproc.c(343): warning:  #128-D: loop is not reachable
+compiling HAL.c...
+compiling memory.c...
+compiling message.c...
+message.c(44): warning:  #177-D: variable "meh" was declared but never referenced
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+compiling atomic.c...
+compiling lib.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+linking...
+Program Size: Code=6612 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 11 Warning(s).
+Rebuild target 'HelloWorld SIM'
+assembling startup_LPC17xx.s...
+compiling system_LPC17xx.c...
+compiling main.c...
+compiling process.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+process.c(115): warning:  #188-D: enumerated type mixed with another type
+process.c(108): warning:  #177-D: variable "val" was declared but never referenced
+compiling userproc.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+userproc.c(343): warning:  #128-D: loop is not reachable
+compiling HAL.c...
+compiling memory.c...
+compiling message.c...
+message.c(44): warning:  #177-D: variable "meh" was declared but never referenced
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(228): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(248): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+uart_irq.c(221): warning:  #177-D: variable "i" was declared but never referenced
+compiling atomic.c...
+compiling lib.c...
+lib.h(8): warning:  #1-D: last line of file ends without a newline
+linking...
+Program Size: Code=6612 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 10 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10001BC3H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10001BC3H
 Partial Programming Done (areas with no algorithms skipped!)
 Partial Verify OK (areas with no algorithms skipped!)
 Clean started: Project: 'Lab1'

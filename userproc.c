@@ -1,6 +1,7 @@
 #include "rtx.h"
 #include "uart.h"
 #include "userproc.h"
+#include "lib.h"
 #ifdef DEBUG_0
 #include <stdio.h>
 #endif  /* DEBUG_0 */
@@ -225,6 +226,49 @@ void proc6(void) {
 }
 */
 
+int is_valid_time_cmd(char* a){
+	char *b = a;
+	int i = 0;
+	int timeCheck = 0;
+	
+	//Check for correct length
+	while(*b != '\0'){
+		b++;
+		i++;
+	}
+	if(i != 12)
+	 return FALSE;
+
+	//Check for the colons 
+	if(*(a+6) != ':' || *(a+9) != ':')
+		 return FALSE;
+	
+	//Check for the valid numbers
+	for(i = 4; i < 12; i++){
+	 if(i != 6 && i != 9){
+		if(*(a+i) < '0' || *(a+i) > '9')
+			 return FALSE;
+ 		}
+	}
+	
+	//Check is time is valid
+	timeCheck = (*(a + 4) - '0')*10 +(*(a + 5) - '0');
+	if(timeCheck >= 24){
+		return FALSE;
+	}
+	timeCheck = (*(a + 7) - '0')*10 +(*(a + 8) - '0');
+	if(timeCheck >= 60){
+		return FALSE;
+	}
+	timeCheck = (*(a + 10) - '0')*10 +(*(a + 11) - '0');
+	if(timeCheck >= 60){
+		return FALSE;
+	}
+	
+	return TRUE;
+
+}
+
 void proc6(void){
 	//24 hour wall clock - is supposed to ba a user level process
 	Message *new_Message;
@@ -234,6 +278,7 @@ void proc6(void){
 	int sender_id = 2;
 	char* received_msg_data;
 	int displayTime = 0;
+	int time = 0;
 	
 	uart_put_string("Test 7: 24 Hour Wall Clock Display Process\n\r");
 	start_clk = FALSE;
@@ -260,8 +305,29 @@ void proc6(void){
 				displayTime = 1;
 				set_timer_count(0);
 				start_clk = TRUE;
-			}else if(string_equals(received_msg_data, "%WS")){
-				
+			}else if(contains_prefix(received_msg_data, "%WS")){
+				if(is_valid_time_cmd(received_msg_data)){	
+					time = 0;
+					time += (*(received_msg_data + 4) - '0')*3600*10;
+					time += (*(received_msg_data + 5) - '0')*3600;
+					time += (*(received_msg_data + 7) - '0')*60*10;
+					time += (*(received_msg_data + 8) - '0')*60;
+					time += (*(received_msg_data + 10) - '0')*10;
+					time += (*(received_msg_data + 11) - '0');
+					time *= 1000;
+					set_timer_count(time); 
+					displayTime = 1;
+					start_clk = TRUE;
+				} else {
+					new_Message = (Message*)request_memory_block();
+					message_data = (char*)request_memory_block();
+					new_Message->type = CRT_DISPLAY;
+					new_Message->dest_pid = get_system_pid(CRT);
+					new_Message->sender_pid = 6;
+					new_Message->data = string_copy(request_memory_block(), "No you don't!\n\r");
+	
+					send_message(get_system_pid(CRT), (void*) new_Message);
+				}
 			}else if(string_equals(received_msg_data, "%WT")){
 				displayTime = 0;
 			}
@@ -279,6 +345,8 @@ void proc6(void){
 	while (true);
 	
 }
+
+
 
 int ProcessCount = 6;
 void* ProcessTable[] = {

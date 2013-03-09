@@ -243,27 +243,28 @@ void k_uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 				if(command_index <BUFSIZE-1){
 					
 					if(*p_buffer == (char)13){
-					//	*(data_buff + 1) = '\0';
+						
 						cmdMsg = (Message*)k_request_memory_block();
 						cmdMsg->data = data_buff;
 						cmdMsg->type = COMMAND;
 						cmdMsg->dest_pid = k_get_system_pid(KCD);
 						cmdMsg->sender_pid = k_get_system_pid(UART);
 						send_msg(k_get_system_pid(KCD), cmdMsg, 0);
+						*(data_buff + command_index) = '\0';
 						
 						
 						inputMsg = (Message*)k_request_memory_block();
-						inputData = (char*)k_request_memory_block();
-						*(data_buff + command_index) = '\0';
-						for(i = 0; i <= command_index; i++){
-							*(inputData + i) = *(data_buff + i);
-						}
-						inputMsg->data = inputData;
-
+						crtData = (char*)k_request_memory_block();
+						*crtData = '\r';
+						*(crtData+1) = '\n';
+						*(crtData+2) = '\0';
+						inputMsg->data = crtData;
 						inputMsg->type = CRT_DISPLAY;
 						inputMsg->dest_pid = k_get_system_pid(CRT);
 						inputMsg->sender_pid = k_get_system_pid(UART);
 						send_msg(k_get_system_pid(CRT), inputMsg, 0);
+	
+
 						
 						read_command = FALSE;
 						command_index = 0;
@@ -292,7 +293,7 @@ void k_uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 			inputMsg = (Message*)k_request_memory_block();
 			crtData = (char*)k_request_memory_block();
 			//*(data_buff + command_index) = '\0';
-			*crtData = *(data_buff+command_index-1);\
+			*crtData = *(data_buff+command_index-1);
 			*(crtData + 1) = '\0';
 			inputMsg->data = crtData;
 

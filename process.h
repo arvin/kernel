@@ -12,7 +12,7 @@
 #include "message.h"
 
 /* process states, note we only assume three states in this example */
-typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, WAIT_FOR_INTERRUPT} proc_state_t;  
+typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, WAIT_FOR_INTERRUPT, INTERRUPTED} proc_state_t;  
 
 
 /*
