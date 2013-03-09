@@ -74,10 +74,8 @@ void crt_proc(){
 			msgData =  (msg->data);
 			uart_put_string(msgData);
 		}
-		else{
-			release_memory_block(msg->data);
-			release_memory_block(msg);
-		}
+		release_memory_block(msg->data);
+		release_memory_block(msg);
 	}
 }
 

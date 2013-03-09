@@ -225,10 +225,10 @@ void k_uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
   receivedMsg =	(Message*)system_proc_receive_message(UART);
 	if(receivedMsg) {
 		
-		  msgData = (char*) (receivedMsg->data);
-			uart_put_string(msgData);
-			release_memory_block(receivedMsg);
-			release_memory_block(receivedMsg->data);
+		msgData = (char*) (receivedMsg->data);
+		uart_put_string(msgData);
+		release_memory_block(receivedMsg);
+		release_memory_block(receivedMsg->data);
 	}
 	else{
 		LPC_UART0->IER = IER_THRE | IER_RLS; 
