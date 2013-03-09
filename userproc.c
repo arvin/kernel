@@ -9,6 +9,7 @@
 
 int passCount = 0;
 int proc4Stage = 0;
+int start_clk;
 
 
 //Original, old process 1
@@ -232,10 +233,11 @@ void proc6(void){
 	char* s = "%W";
 	int sender_id = 2;
 	char* received_msg_data;
+	int displayTime = 0;
 	
 	uart_put_string("Test 7: 24 Hour Wall Clock Display Process\n\r");
-	
-	new_Message = (Message*) request_memory_block();
+	start_clk = FALSE;
+	new_Message = (Message*)request_memory_block();
 	message_data = (char*)request_memory_block();
 	message_data = s;
  	
@@ -246,30 +248,32 @@ void proc6(void){
 
 	send_message(get_system_pid(KCD), (void*) new_Message);
 	
-	while(1)
-	{
+	set_process_priority(6, 0);
+	
+	while(1){
 		msg = (Message*)receive_message(& sender_id);
 
 		received_msg_data =  (msg->data);
-		uart_put_string("I received\r\n");
-		uart_put_string(received_msg_data);
-		uart_put_string("\n");
 		
 	 if(msg->type == COMMAND){
-			if(string_equals(msg_data, "%WR")){
-					
-			}else if(string_equals(msg_data, "%WS")){
+			if(string_equals(received_msg_data, "%WR")){
+				displayTime = 1;
+				set_timer_count(0);
+				start_clk = TRUE;
+			}else if(string_equals(received_msg_data, "%WS")){
 				
-			}else if(string_equals(msg_data, "%WT")){
-				
+			}else if(string_equals(received_msg_data, "%WT")){
+				displayTime = 0;
 			}
-	}
+		}
+		else if(msg->type == DISPLAY_TIME){
+			if(displayTime)
+				display_time();
+		}
 		
 		release_memory_block(msg->data);
 		release_memory_block(msg);
-
 	}
-	
 	do
 		release_processor();
 	while (true);

@@ -15,12 +15,11 @@ ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
 
-pcb_t* procArr[12];
-ProcessNode* systemProcesses[5];
+pcb_t* procArr[11];
+ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
 int g_timer_count = 0;
-int start_clk = FALSE;
 int wall_clk_handler = 0;
 
 void null_process(void) {
@@ -34,9 +33,6 @@ void keyboard_proc(void){
     Message *msg;
 		char* msg_data;
 	  int sender_id = k_get_system_pid(KCD); //random id;
-	  char curChar;
-	  int hot_key = 0;
-	  int read_input = 0;
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 			msg_data = (char*) msg->data;
@@ -73,51 +69,68 @@ void crt_proc(){
 	while(1) {
 		msg = (Message*)receive_message(& sender_id);
 		if(msg->type == CRT_DISPLAY){
+			//send_message(get_system_pid(UART), msg);
+			//k_uart_i_process();
 			msgData =  (msg->data);
 			uart_put_string(msgData);
 		}
-		release_memory_block(msg->data);
-		release_memory_block(msg);
+		else{
+			release_memory_block(msg->data);
+			release_memory_block(msg);
+		}
 	}
 }
 
 
 
 void timer_i_process(){
+		Message *new_Message;
 		k_dec_delay_msg_time();
 		g_timer_count++ ;
-		if(start_clk){
-			
-		}
 		g_timer_count %= 3600*24*1000;
+		if(start_clk && (g_timer_count%1000 == 0)){
+				new_Message = (Message*) k_request_memory_block();
+				new_Message->sender_pid = k_get_system_pid(TIMER);
+				new_Message->dest_pid = wall_clk_handler;
+				new_Message->type = DISPLAY_TIME;
+				new_Message->data = NULL;
+			  k_send_message(wall_clk_handler, new_Message);
+		}
 }
 
 
-void display_time(){
-		Message* msg;
-		int sender_id;
-  	int count;
-  	int hh;
-  	int mm;
-  	int ss;
+
+void k_set_timer_count(int time){
+	g_timer_count = time;
+}
+
+
+void k_display_time(){
+		int count = g_timer_count / 1000;
+		int val;
 	
-		while(1) {
-			msg = (Message*)receive_message(& sender_id);
-			
-			count = g_timer_count / 1000;
-			hh = count/3600;
-			mm = (count/60)%60;
-			ss = count%60;
-			uart_put_int(hh);
-			uart_put_char(':');
-			uart_put_int(mm);
-			uart_put_char(':');
-			uart_put_int(ss);
-			uart_put_string("\n");
-			
-			k_release_memory_block(msg->data);
-			k_release_memory_block(msg);
-		}
+		char* data = (char*)k_request_memory_block();
+	
+		Message* crt_message = (Message*)k_request_memory_block();
+		crt_message->type = CRT_DISPLAY;
+		crt_message->dest_pid = k_get_system_pid(CRT);
+		crt_message->sender_pid = k_get_system_pid(curProcess->pcb.m_pid);
+		crt_message->data = (void*)data;
+	
+		*(data++) = '\r';
+		*(data++) = (count/3600) / 10 + '0';
+		*(data++) = (count/3600) % 10 + '0';
+		*(data++) = ':';
+		*(data++) = ((count/60)%60) / 10 + '0';
+		*(data++) = ((count/60)%60) % 10 + '0';
+		*(data++) = ':';
+		*(data++) = (count%60) / 10 + '0';
+		*(data++) = (count%60) % 10 + '0';
+		*(data++) = '\r';
+		*(data++) = '\0';
+	
+		send_msg(k_get_system_pid(CRT), crt_message, 0);
+
 }
 
 
@@ -165,7 +178,7 @@ void process_init() {
 	init_pcb(&timer_i_process, systemProcesses[TIMER], 3, FALSE);
 	
 	systemProcesses[UART] = (ProcessNode*)k_request_memory_block();
-	init_pcb(&uart_i_process, systemProcesses[UART], 3, FALSE);
+	init_pcb(&k_uart_i_process, systemProcesses[UART], 3, FALSE);
 	
 	// System process initialization
 	systemProcesses[KCD] = (ProcessNode*)k_request_memory_block();
@@ -176,9 +189,6 @@ void process_init() {
 	init_pcb(&crt_proc, systemProcesses[CRT], 0, TRUE);
 	push_process(readyQueue, systemProcesses[CRT]);
 	
-	systemProcesses[WALL_CLOCK] = (ProcessNode*)k_request_memory_block();
-	init_pcb(&display_time, systemProcesses[WALL_CLOCK], 0, TRUE);
-	push_process(readyQueue, systemProcesses[WALL_CLOCK]);
 }
 
 
@@ -500,7 +510,12 @@ int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
 
 
 void* k_receive_message(int* sender_id) {
-    return removeMessage(&(curProcess->pcb.msgQueue), sender_id);
+    return removeMessage(&(curProcess->pcb.msgQueue), sender_id, 1);
+}
+
+void* system_proc_receive_message(system_proc_type type){
+		int sender_id;
+    return removeMessage(&(systemProcesses[type]->pcb.msgQueue), &sender_id, 0);
 }
 
 

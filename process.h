@@ -14,6 +14,7 @@
 /* process states, note we only assume three states in this example */
 typedef enum {NEW = 0, RDY, RUN, INSUFFICIENT_MEMORY, MSG_WAIT, WAIT_FOR_INTERRUPT} proc_state_t;  
 
+
 /*
   PCB data structure definition.
   You may want to add your own member variables
@@ -65,11 +66,13 @@ extern void __rte(void);           /* pop exception stack frame */
 int k_send_message(int process_ID, void *messageEnvelope);
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 void* k_receive_message(int* sender_id);
+void* system_proc_receive_message(system_proc_type type);
 void k_dec_delay_msg_time(void);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
 void timer_i_process(void);
-void display_time(void);
+void k_display_time(void);
 int k_get_system_pid(system_proc_type type);
+void k_set_timer_count(int time);
 void print_process(void);
 
 #endif /* ! _PROCESS_H_ */

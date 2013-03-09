@@ -16,7 +16,7 @@ typedef struct MessageQueue {
 } MessageQueue;
 
 void addMessage(MessageQueue* queue, Message* msg, int delay);
-Message* removeMessage(MessageQueue* queue, int* sender_id);
+Message* removeMessage(MessageQueue* queue, int* sender_id, int blocking);
 MessageNode* pollMessageQueue(MessageQueue* queue);
 __asm void save_release_processor(void);
 void wait_on_message(void);
