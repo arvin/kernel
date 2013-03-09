@@ -265,6 +265,7 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len ){
 
 			inputData = (char*)k_request_memory_block();
 			*inputData = *p_buffer;
+			*(inputData + 1) = '\0';
 			inputMsg->data = inputData;
 			inputMsg->type = KEYBOARD_INPUT;
 			inputMsg->dest_pid = k_get_system_pid(KCD);
@@ -279,7 +280,7 @@ void uart_i_process( uint8_t *p_buffer, uint32_t len ){
 		inputMsg = (Message*)k_request_memory_block();
 		crtData = (char*)k_request_memory_block();
 		//*(data_buff + command_index) = '\0';
-		*crtData = *(data_buff+command_index-1);\
+		*crtData = *(data_buff+command_index-1);
 		*(crtData + 1) = '\0';
 		inputMsg->data = crtData;
 

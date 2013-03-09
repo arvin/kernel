@@ -58,10 +58,15 @@ void keyboard_proc(void){
 						release_memory_block(msg_data);
 						release_memory_block(msg);
 					}
-				}
+				} 
 			}else if(msg->type == KEYBOARD_INPUT){
-				release_memory_block(msg_data);
-				release_memory_block(msg);
+				if(string_equals(msg_data, "!") || string_equals(msg_data, "!\0")){
+					print_process();
+					release_memory_block(msg_data);
+					release_memory_block(msg);
+				}else{
+					hot_key = 0;
+				}
 			}
 		}
 }
@@ -328,7 +333,6 @@ int k_release_processor(proc_state_t newState) {
 			break;
 	}
 	switch_process();
-	print_process();
 	return 0;
 }
 
@@ -399,7 +403,7 @@ void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 
 
 // Internal call for releasing processor
-int switch_process(void) {
+	int switch_process(void) {
 	volatile int i;
 	volatile proc_state_t state;
 	ProcessNode *oldProcess = NULL;
@@ -552,9 +556,86 @@ int k_get_system_pid(system_proc_type type){
 
 
 void print_process(){
+		Message* crt_message = (Message*)request_memory_block();
+		Message* crt_message2 = (Message*)request_memory_block();
+		char* data = (char*)request_memory_block();
+		char* data2 = (char*)request_memory_block();
+		char* sendTo = data;
+		char* sendTo2 = data2;
+		int i = 0;
+		int anyBlockedQueues = 0;
+		int anyBlockedRecieveQueues = 0;
+		ProcessNode* curr;
+		int sizeOfString = 0;
+		char* str = "Ready Queue:\n\r";
+		data = append_to_block((char*)data,(char*)str);
+		str = "Ready\n\r";
+		data = append_to_block((char*)data,(char*)str);
+		curr = readyQueue->first;
+		str = "     \n\r";
+		while(curr != NULL){
+			data = append_to_block((char*)data, "\r PID: ");
+			*str = curr->pcb.m_pid + '0';
+			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
+			data = append_to_block((char*)data, "\r Priority: ");
+			*str = curr->pcb.priority + '0';
+			data = append_to_block((char*)data, str);
+			data = append_to_block((char*)data, "\n");
+			curr = curr->next;
+		}
+		
+		
+		str = ("Blocked Memory Queue:\n\r");
+		data = append_to_block((char*)data,(char*)str);
+		str = "     \n\r";
+	for (i = 0; i < PRIORITY_COUNT; ++i){
+		curr = blockedQueues[i]->first;
+		while(curr!=NULL){
+			anyBlockedQueues = 1;
+			data = append_to_block((char*)data, "\r PID: ");
+			*str = curr->pcb.m_pid + '0';
+			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
+			data = append_to_block((char*)data, "\r Priority: ");
+			*str = curr->pcb.priority + '0';
+			data = append_to_block((char*)data, str);
+			data = append_to_block((char*)data, "\n");
+			curr = curr->next;
+		}
+	}
+	
+	if(anyBlockedQueues == 0){
+		str = ("No Blocked Queue's!\n\r\n\r");
+		data = append_to_block((char*)data,(char*)str);
+	}
+	eos((char*)data);
+	
+	
+	
+		str = ("Blocked Receive Queue Queue:\n\r");
+		data2 = append_to_block((char*)data2,(char*)str);
+		str = "       \n\r";
+		
+		curr = blockedMsgQueues->first;
+		while(curr!=NULL){
+				anyBlockedRecieveQueues = 1;
+				data2 = append_to_block((char*)data2, "\r PID: ");
+				*str = curr->pcb.m_pid + '0';
+				data2 = append_to_block(data2, str); //Note might have to double check in case it's 2 digit
+				data2 = append_to_block((char*)data2, "\r Priority: ");
+				*str = curr->pcb.priority + '0';
+				data2 = append_to_block((char*)data2, str);
+				data2 = append_to_block((char*)data2, "\n");
+				curr = curr->next;
+		}
+	
+		if(anyBlockedRecieveQueues == 0){
+			str = ("No Blocked Recieve Queue's!\n\r\n\r");
+			data2 = append_to_block((char*)data2,(char*)str);
+		}
+	
+		eos((char*)data2);
 	/*
-	int i = 0;
-	ProcessNode* curr;
+
 	Print all processes on ready queue
 	uart_put_string("Ready Queue:\n\r");
 	
@@ -592,6 +673,33 @@ void print_process(){
 		curr = curr->next;
 	}
 	*/
+		crt_message->type = CRT_DISPLAY;
+		crt_message->dest_pid = get_system_pid(CRT);
+		crt_message->sender_pid = get_system_pid(KCD);
+		crt_message->data = (void*)sendTo;
+		send_message(get_system_pid(CRT), crt_message);
+		
+		crt_message2->type = CRT_DISPLAY;
+		crt_message2->dest_pid = get_system_pid(CRT);
+		crt_message2->sender_pid = get_system_pid(KCD);
+		crt_message2->data = (void*)sendTo2;
+		send_message(get_system_pid(CRT), crt_message2);
+		
 }
 
+char* append_to_block(char* block, char* str){
+	int i = 0;
+	int sizeOfString = 0;
+	char* data = block;
+	sizeOfString = size(str);
+	for(i = 0;i<sizeOfString;i++){
+	   *(data++) = *(str+i);
+	}
+	return data;
 
+}
+
+void eos(char* block){
+	*(block++) = '\0';
+
+}

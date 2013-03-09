@@ -9,8 +9,6 @@
 
 int main() {
 	SystemInit();
-	
-	
 	atomic(0);
 	uart_init(0);
 	memory_init();

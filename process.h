@@ -71,5 +71,7 @@ void timer_i_process(void);
 void display_time(void);
 int k_get_system_pid(system_proc_type type);
 void print_process(void);
-
+char* append_to_block(char* block, char* str);
+void eos(char* block);
+void clear(char* block);
 #endif /* ! _PROCESS_H_ */
