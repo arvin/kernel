@@ -66,7 +66,7 @@ int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 void* k_receive_message(int* sender_id);
 void* system_proc_receive_message(system_proc_type type);
 int k_dec_delay_msg_time(void);
-ProcessNode * shift_ready_process(int pid);
+void shift_ready_process(int pid);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
 void k_display_time(void);
 int k_get_system_pid(system_proc_type type);

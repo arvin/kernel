@@ -11,7 +11,7 @@ int string_equals(char* a, char* b){
 	return (*a == '\0' && *b == '\0');
 }
 
-int size(char *ptr)
+int string_len(char *ptr)
 {
     //variable used to access the subsequent array elements.
     int offset = 0;

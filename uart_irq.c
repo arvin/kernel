@@ -235,7 +235,7 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
   receivedMsg =	(Message*)system_proc_receive_message(UART);
 	if(receivedMsg) {
 		
-		msgData = (char*) (receivedMsg->data);
+		msgData = (unsigned char*) (receivedMsg->data);
 		uart_put_string(msgData);
 		release_memory_block(receivedMsg);
 		release_memory_block(receivedMsg->data);
@@ -255,7 +255,7 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 					if(*p_buffer == (char)13){
 						
 						cmdMsg = (Message*)k_request_memory_block();
-						cmdMsg->data = data_buff;
+						cmdMsg->data = (void*)data_buff;
 						cmdMsg->type = COMMAND;
 						cmdMsg->dest_pid = k_get_system_pid(KCD);
 						cmdMsg->sender_pid = k_get_system_pid(UART);

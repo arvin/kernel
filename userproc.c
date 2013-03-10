@@ -9,51 +9,39 @@
 #define true 1
 
 int passCount = 0;
-int proc4Stage = 0;
+int procStage = 0;
 int start_clk;
 
-
-//Original, old process 1
-/*
-void proc1(void) {
-	uart_put_string("-- RTX Test Start --\n\r");
-	uart_put_string("Test 1: Deallocate non-existing blocks.\n\r");
-	
-	
-	if (release_memory_block(0)) {
-		passCount++;
-		uart_put_string("PASSED\n\r");
-	}
-	else
-		uart_put_string("FAILED\n\r");
-	
-	do
-		release_processor();
-	while (true);
+void sendCRTMsg(char* msg, int sender_pid){
+	Message* crt_msg;
+	crt_msg = (Message*) request_memory_block();
+	crt_msg->type = CRT_DISPLAY;
+	crt_msg->dest_pid = get_system_pid(CRT);
+	crt_msg->sender_pid = sender_pid;
+	crt_msg->data = string_copy(request_memory_block(), msg);
+	send_message(get_system_pid(CRT), (void*) crt_msg);
 }
-*/
+
 
 //New process 1
 void proc1(void) {
 	
 	Message* msg;
+	
 	int sender_id = 2;
 	int* msgNum;
-	uart_put_string("-- RTX Test Start --\n\r");
-	uart_put_string("Test 1: Deallocate non-existing blocks.\n\r");
-
-	if (release_memory_block(0)) {
-		passCount++;
-		uart_put_string("PASSED\n\r");
-	}
-	else
-		uart_put_string("FAILED\n\r");
+	
+	sendCRTMsg("-- RTX Test Start --\n\rTest 1: Delayed Receive\n\r", 1);
 	
 	msg = (Message*)receive_message(& sender_id);
-
 	msgNum =  (msg->data);
-	uart_put_int(*msgNum);
-	uart_put_string("\n\r\n\r");
+	
+	if (procStage == 1 && *msgNum == 9999) {
+		sendCRTMsg("Test 1: PASSED\n\r", 1);
+	}
+	else
+		sendCRTMsg("Test 1: FAILED\n\r", 1);
+	
 	release_memory_block(msg->data);
 	release_memory_block(msg);
 	
@@ -62,24 +50,10 @@ void proc1(void) {
 	while (true);
 }
 
-
-//Old process 2
-/*
-void proc2(void){
-	uart_put_string("Test 2: Release processor\n\r");
-	
-  do
-		release_processor();
-	while (true);
-}
-*/
-
-
-
 void proc2(void){
 	Message* new_Message;
 	int* message_data;
-	uart_put_string("Test 2: Release processor\n\r");
+	sendCRTMsg("Test 2: Delayed Send\n\r", 2);
 	
 	new_Message = (Message*) request_memory_block();
 	message_data = (int*)request_memory_block();
@@ -90,8 +64,8 @@ void proc2(void){
 	new_Message->dest_pid = 1;
 	new_Message->type = 1;
 
-//	send_message(1, (void*) new_Message);
 	delayed_send(1, (void*) new_Message, 5);
+	procStage++;
   do
 		release_processor();
 	while (true);
@@ -103,19 +77,17 @@ void proc3(void){
 	int errorFlag = 0;
 	
 	passCount++;
-	uart_put_string("PASSED\n\r");
-	
-	uart_put_string("Test 3: Allocate and deallocate memory 50 times.\n\r");
+	sendCRTMsg("Test 3: Allocate and deallocate memory 50 times.\n\r", 3);
 	
 	for(i = 0; i < 50; i++){
 		errorFlag |= release_memory_block(request_memory_block());
 	}
 	
 	if (errorFlag)
-		uart_put_string("FAILED\n\r");
+		sendCRTMsg("FAILED\n\r", 3);
 	else {
 		passCount++;
-		uart_put_string("PASSED\n\r");
+		sendCRTMsg("PASSED\n\r", 3);
 	}
 	
 	do
@@ -126,105 +98,51 @@ void proc3(void){
 
 void proc4(void){
 	//Allocate to max and then deallocate all
-	/*
-	void** arr[3];
-	int i = 0;
-	int errorFlag = 0;
+	int result;
 	
-	uart_put_string("Test 4 (Step 1): Allocate 95 blocks.\n\r");
-	for (i = 0; i < 3; ++i)
-		arr[i] = request_memory_block();
-	
-	i = 0;
-	while(i < 92) {
-		arr[i/32][i%32] = (void *)request_memory_block();
-		i++;
-	}
-	
-	proc4Stage++;
-	release_processor();
-	
-	uart_put_string("Test 4 (Step 2): Deallocate 95 blocks.\n\r");
-	i--;
-	
-	while(i >= 0) {
-		errorFlag |= release_memory_block(arr[i/32][i%32]);
-		i--;
-	}
-	for (i = 0; i < 3; ++i)
-		errorFlag |= release_memory_block(arr[i]);
-	
-	if (errorFlag)
-		uart_put_string("FAILED\n\r");
-	else {
+	result = set_process_priority(1, 2);
+	sendCRTMsg("Test 4a: Set priority to a valid number.\n\r", 4);
+	if(result == 0) {
 		passCount++;
-		uart_put_string("PASSED\n\r");
+		sendCRTMsg("PASSED\n\r", 4);
 	}
+	else
+		sendCRTMsg("FAILED\n\r", 4);
 	
-	proc4Stage++;
-	*/
+	result = set_process_priority(1, 9000);
+	
+	sendCRTMsg("Test 4b: Set priority to an invalid number.\n\r", 4);
+	if(result == -1) {
+		passCount++;
+		sendCRTMsg("PASSED\n\r", 4);
+	}
+	else
+		sendCRTMsg("FAILED\n\r", 4);
+	
+	sendCRTMsg("Test 4c: Setting priority of null process should be prohibited.\n\r", 4);
+	set_process_priority(0, 1);
+	if(result == -1) {
+		passCount++;
+		sendCRTMsg("PASSED\n\r", 4);
+	}
+	else
+		sendCRTMsg("FAILED\n\r", 4);
+	
+	
+
 	do
 		release_processor();
 	while (true);
 }
 
 void proc5(void) {
-	void* block;
-	block = request_memory_block();
-	release_memory_block(block);
-	uart_put_string("Test 5: Request for memory block while all memory blocks are used.\n\r");
-	if (proc4Stage == 2) {
-		passCount++;
-		uart_put_string("PASSED\n\r");
-	}
-	else
-		uart_put_string("FAILED\n\r");
+	sendCRTMsg("Test 5: CHECK IF CRT PRINTS THE MESSAGE.\n\r", 4);
 	
 	do
 		release_processor();
 	while (true);
 }
-/*
-void proc6(void) {
-	int result;
-	
-	result = set_process_priority(1, 2);
-	uart_put_string("Test 6a: Set priority to a valid number.\n\r");
-	if(result == 0) {
-		passCount++;
-		uart_put_string("PASSED\n\r");
-	}
-	else
-		uart_put_string("FAILED\n\r");
-	
-	result = set_process_priority(1, 9000);
-	
-	uart_put_string("Test 6b: Set priority to an invalid number.\n\r");
-	if(result == -1) {
-		passCount++;
-		uart_put_string("PASSED\n\r");
-	}
-	else
-		uart_put_string("FAILED\n\r");
-	
-	uart_put_string("Test 6c: Setting priority of null process should be prohibited.\n\r");
-	set_process_priority(0, 1);
-	if(result == -1) {
-		passCount++;
-		uart_put_string("PASSED\n\r");
-	}
-	else
-		uart_put_string("FAILED\n\r");
-	
-	uart_put_string("Total number of pass count:\n\r");
-	uart_put_int(passCount);
-	uart_put_string(" out of 8 passed in total.\n\r");
-	uart_put_string("-- RTX Test End --\n\r");
-	do
-		release_processor();
-	while (true);
-}
-*/
+
 
 int is_valid_time_cmd(char* a){
 	char *b = a;
@@ -280,7 +198,7 @@ void proc6(void){
 	int displayTime = 0;
 	int time = 0;
 	
-	uart_put_string("Test 7: 24 Hour Wall Clock Display Process\n\r");
+	sendCRTMsg("Test 6: 24 Hour Wall Clock Display Process\n\r", 6);
 	start_clk = FALSE;
 	new_Message = (Message*)request_memory_block();
 	message_data = (char*)request_memory_block();
@@ -294,6 +212,8 @@ void proc6(void){
 	send_message(get_system_pid(KCD), (void*) new_Message);
 	
 	set_process_priority(6, 0);
+	
+	sendCRTMsg("-- RTX Test End --\n\r", 6);
 	
 	while(1){
 		msg = (Message*)receive_message(& sender_id);
@@ -319,14 +239,7 @@ void proc6(void){
 					displayTime = 1;
 					start_clk = TRUE;
 				} else {
-					new_Message = (Message*)request_memory_block();
-					message_data = (char*)request_memory_block();
-					new_Message->type = CRT_DISPLAY;
-					new_Message->dest_pid = get_system_pid(CRT);
-					new_Message->sender_pid = 6;
-					new_Message->data = string_copy(request_memory_block(), "No you don't!\n\r");
-	
-					send_message(get_system_pid(CRT), (void*) new_Message);
+					sendCRTMsg("No you don't!\n\r", 6);
 				}
 			}else if(string_equals(received_msg_data, "%WT")){
 				displayTime = 0;
@@ -340,7 +253,7 @@ void proc6(void){
 		release_memory_block(msg->data);
 		release_memory_block(msg);
 	}
-	
+
 }
 
 

@@ -17,7 +17,6 @@ void addMessage(MessageQueue* queue, Message* msg, int delay){
 	node->next = NULL;
 	queue->size++;
 	atomic(1);
-	//__enable_irq();
 }
 
 MessageNode* pollMessageQueue(MessageQueue* queue) {
@@ -41,7 +40,7 @@ MessageNode* pollMessageQueue(MessageQueue* queue) {
 
 // Add process to the back of the specified queue
 Message* removeMessage(MessageQueue* queue, int* sender_id, int blocking) {
-	const volatile MessageQueue* meh = queue;
+	volatile MessageQueue* tmp = queue;
 	do {
 		MessageNode* node = pollMessageQueue(queue);
 		if(node != NULL) {
@@ -58,6 +57,8 @@ Message* removeMessage(MessageQueue* queue, int* sender_id, int blocking) {
 	return NULL;
 }
 
+// Preserve register values
+// Note: This is required for removeMessage since the value of queue is lost during release processor even if queue is defined to be volatile
 __asm void save_release_processor(void)
 {
 	PRESERVE8

@@ -32,7 +32,6 @@ void null_process(void) {
 
 void keyboard_proc(void){
     Message *msg;
-		int hot_key;
 		char* msg_data;
 	  int sender_id = get_system_pid(KCD); //random id;
 	  while(1){
@@ -62,8 +61,6 @@ void keyboard_proc(void){
 					print_process();
 					release_memory_block(msg_data);
 					release_memory_block(msg);
-				}else{
-					hot_key = 0;
 				}
 			}
 		}
@@ -362,7 +359,7 @@ ProcessNode* remove_process(ProcessQueue* queue, int pid) {
 	return NULL;
 }
 
-ProcessNode * shift_ready_process(int pid){
+void shift_ready_process(int pid) {
 	ProcessNode* node = remove_process(readyQueue,  pid);
 	if(node != NULL){
 		push_process(readyQueue, node);
@@ -581,18 +578,13 @@ void print_process(){
 		char* sendTo2 = data2;
 		char* sendTo3 = data3;
 	
-	
 		int curCounter = 0;
 		int i = 0;
-	char* str;
+		char* str;
 		int anyBlockedQueues = 0;
 		int anyBlockedRecieveQueues = 0;
 		ProcessNode* curr;
-		int sizeOfString = 0;
-		//char* str = "Ready Queue:\n\r";
-		//data = append_to_block((char*)data,(char*)str);
-		//str = "Ready\n\r";
-		//data = append_to_block((char*)data,(char*)str);
+
 		curr = readyQueue->first;
 		str = "     \n\r";
 		
@@ -739,8 +731,8 @@ char* append_to_block(char* block, char* str){
 	int i = 0;
 	int sizeOfString = 0;
 	char* data = block;
-	sizeOfString = size(str);
-	for(i = 0;i<sizeOfString;i++){
+	sizeOfString = string_len(str);
+	for(i = 0; i < sizeOfString; i++){
 	   *(data++) = *(str+i);
 	}
 	return data;
