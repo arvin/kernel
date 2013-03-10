@@ -61,7 +61,7 @@ extern int k_delayed_send(int process_ID, void *MessageEnvelope, int delay);
 #define delayed_send(process_ID, MessageEnvelope, delay) _delayed_send((U32)k_delayed_send, process_ID, MessageEnvelope, delay)
 int _delayed_send(U32 p_func, int process_ID, void* MessageEnvelope, int delay) __SVC_0;
 
-extern void k_dec_delay_msg_time(void);
+extern int k_dec_delay_msg_time(void);
 #define dec_delay_msg_time() _dec_delay_msg_time((U32)k_dec_delay_msg_time)
 int _dec_delay_msg_time(U32 p_func) __SVC_0;
 
@@ -76,6 +76,5 @@ void _display_time(U32 p_func) __SVC_0;
 extern void k_set_timer_count(int time);
 #define set_timer_count(time) _set_timer_count((U32)k_set_timer_count, time)
 void _set_timer_count(U32 p_func, int time) __SVC_0;
-
 
 #endif /* !_RTX_H_ */

@@ -7,22 +7,15 @@ N:\kernel\kernel\Lab1.uvproj
 Project File Date:  03/09/2013
 
 <h2>Output:</h2>
-Build target 'HelloWorld SIM'
-compiling timer.c...
-linking...
-Program Size: Code=6772 RO-data=388 RW-data=112 ZI-data=824  
-"Lab1.axf" - 0 Error(s), 0 Warning(s).
-Load "N:\\kernel\\kernel\\Lab1.AXF" 
-No Algorithm found for: 10000000H - 10001C63H
-Partial Erase Done (areas with no algorithms skipped!)
-No Algorithm found for: 10000000H - 10001C63H
-Partial Programming Done (areas with no algorithms skipped!)
-Partial Verify OK (areas with no algorithms skipped!)
 Rebuild target 'HelloWorld SIM'
 assembling startup_LPC17xx.s...
 compiling system_LPC17xx.c...
 compiling main.c...
 compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(565): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(697): warning:  #223-D: function "size" declared implicitly
+process.c(713): warning:  #1-D: last line of file ends without a newline
 compiling userproc.c...
 compiling HAL.c...
 compiling memory.c...
@@ -35,13 +28,138 @@ uart_irq.c(258): warning:  #513-D: a value of type "volatile char *" cannot be a
 compiling atomic.c...
 compiling lib.c...
 linking...
-Program Size: Code=6772 RO-data=388 RW-data=112 ZI-data=824  
-"Lab1.axf" - 0 Error(s), 3 Warning(s).
+Program Size: Code=7652 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 7 Warning(s).
 Load "N:\\kernel\\kernel\\Lab1.AXF" 
-No Algorithm found for: 10000000H - 10001C63H
+No Algorithm found for: 10000000H - 10001FD3H
 Partial Erase Done (areas with no algorithms skipped!)
-No Algorithm found for: 10000000H - 10001C63H
+No Algorithm found for: 10000000H - 10001FD3H
 Partial Programming Done (areas with no algorithms skipped!)
 Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling main.c...
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(539): warning:  #940-D: missing return statement at end of non-void function "k_dec_delay_msg_time"
+process.c(565): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(697): warning:  #223-D: function "size" declared implicitly
+process.c(713): warning:  #1-D: last line of file ends without a newline
+compiling userproc.c...
+compiling memory.c...
+compiling message.c...
+message.c(44): warning:  #177-D: variable "meh" was declared but never referenced
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(238): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(258): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+compiling lib.c...
+linking...
+Program Size: Code=7656 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 8 Warning(s).
+Build target 'HelloWorld SIM'
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(514): error:  #20: identifier "highPriority" is undefined
+process.c(514): error:  #20: identifier "rocArr" is undefined
+process.c(575): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(707): warning:  #223-D: function "size" declared implicitly
+process.c(723): warning:  #1-D: last line of file ends without a newline
+Target not created
+Build target 'HelloWorld SIM'
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(513): error:  #20: identifier "highestPriority" is undefined
+process.c(514): error:  #20: identifier "rocArr" is undefined
+process.c(506): warning:  #550-D: variable "highPriority" was set but never used
+process.c(575): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(707): warning:  #223-D: function "size" declared implicitly
+process.c(723): warning:  #1-D: last line of file ends without a newline
+Target not created
+Build target 'HelloWorld SIM'
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(575): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(707): warning:  #223-D: function "size" declared implicitly
+process.c(723): warning:  #1-D: last line of file ends without a newline
+linking...
+Program Size: Code=7692 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 4 Warning(s).
+Build target 'HelloWorld SIM'
+compiling main.c...
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(575): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(707): warning:  #223-D: function "size" declared implicitly
+process.c(723): warning:  #1-D: last line of file ends without a newline
+compiling timer.c...
+linking...
+Program Size: Code=7696 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 4 Warning(s).
+Build target 'HelloWorld SIM'
+compiling timer.c...
+timer.c(119): warning:  #550-D: variable "preemptPid" was set but never used
+linking...
+Program Size: Code=7700 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 1 Warning(s).
+Build target 'HelloWorld SIM'
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(368): warning:  #940-D: missing return statement at end of non-void function "shift_ready_process"
+process.c(582): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(714): warning:  #223-D: function "size" declared implicitly
+process.c(730): warning:  #1-D: last line of file ends without a newline
+compiling timer.c...
+timer.c(119): warning:  #550-D: variable "preemptPid" was set but never used
+linking...
+Program Size: Code=7732 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 6 Warning(s).
+Build target 'HelloWorld SIM'
+compiling main.c...
+compiling process.c...
+process.c(33): warning:  #550-D: variable "hot_key" was set but never used
+process.c(368): warning:  #940-D: missing return statement at end of non-void function "shift_ready_process"
+process.c(582): warning:  #177-D: variable "sizeOfString" was declared but never referenced
+process.c(714): warning:  #223-D: function "size" declared implicitly
+process.c(730): warning:  #1-D: last line of file ends without a newline
+compiling userproc.c...
+compiling memory.c...
+compiling message.c...
+message.c(44): warning:  #177-D: variable "meh" was declared but never referenced
+compiling timer.c...
+compiling uart_irq.c...
+uart_irq.c(238): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "unsigned char *"
+uart_irq.c(258): warning:  #513-D: a value of type "volatile char *" cannot be assigned to an entity of type "void *"
+compiling lib.c...
+linking...
+Program Size: Code=7740 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 8 Warning(s).
+Build target 'HelloWorld SIM'
+compiling timer.c...
+linking...
+Program Size: Code=7768 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 0 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10002047H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10002047H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling timer.c...
+timer.c(118): warning:  #550-D: variable "preemptPid" was set but never used
+linking...
+Program Size: Code=7732 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 1 Warning(s).
+Load "N:\\kernel\\kernel\\Lab1.AXF" 
+No Algorithm found for: 10000000H - 10002023H
+Partial Erase Done (areas with no algorithms skipped!)
+No Algorithm found for: 10000000H - 10002023H
+Partial Programming Done (areas with no algorithms skipped!)
+Partial Verify OK (areas with no algorithms skipped!)
+Build target 'HelloWorld SIM'
+compiling timer.c...
+linking...
+Program Size: Code=7768 RO-data=388 RW-data=112 ZI-data=824  
+"Lab1.axf" - 0 Error(s), 0 Warning(s).
 Clean started: Project: 'Lab1'
    deleting intermediate output files for target 'HelloWorld SIM'

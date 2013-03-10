@@ -109,25 +109,30 @@ __asm void TIMER0_IRQHandler(void)
 /**
  * @brief: c TIMER0 IRQ Handler
  */
-void c_TIMER0_IRQHandler(void)
-{
+void c_TIMER0_IRQHandler(void){
 	trigger_timer_i_process();
-	LPC_TIM0->IR = BIT(0);	
+	
 }
 
 void trigger_timer_i_process() {
+	int preemptPid = 0;
 	set_process_state(get_current_process_id(), INTERRUPTED);
 	set_process_state(k_get_system_pid(TIMER), RUN);
 	
-	timer_i_process();
+	preemptPid = timer_i_process();
 	
 	set_process_state(k_get_system_pid(TIMER), WAIT_FOR_INTERRUPT);
 	set_process_state(get_current_process_id(), RUN);
+	if(preemptPid != 0 && k_get_process_priority(get_current_process_id()) > k_get_process_priority(preemptPid)){
+		shift_ready_process(preemptPid);
+		k_voluntarily_release_processor();
+	}
+	LPC_TIM0->IR = BIT(0);	
 }
 
-void timer_i_process() {
+int timer_i_process() {
 		Message *new_Message;
-		k_dec_delay_msg_time();
+		int preemptPid =k_dec_delay_msg_time();
 		g_timer_count++ ;
 		g_timer_count %= 3600*24*1000;
 		if(start_clk && (g_timer_count%1000 == 0)){
@@ -138,6 +143,7 @@ void timer_i_process() {
 				new_Message->data = NULL;
 			  k_send_message(wall_clk_handler, new_Message);
 		}
+		return preemptPid;
 }
 
 uint32_t get_wall_clk_handler(void) {

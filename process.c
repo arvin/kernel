@@ -360,6 +360,13 @@ ProcessNode* remove_process(ProcessQueue* queue, int pid) {
 	return NULL;
 }
 
+ProcessNode * shift_ready_process(int pid){
+	ProcessNode* node = remove_process(readyQueue,  pid);
+	if(node != NULL){
+		push_process(readyQueue, node);
+	}
+}
+
 
 // Add process to the back of the specified queue
 void push_process(ProcessQueue* queue, ProcessNode* node) {
@@ -497,16 +504,24 @@ void* system_proc_receive_message(system_proc_type type){
 }
 
 
-void k_dec_delay_msg_time(){
+int k_dec_delay_msg_time(){
 	MessageNode* temp;
 	MessageNode* node = msgDelayQueue->first;
 	MessageNode* 	prev = msgDelayQueue->first;
 	Message* msg ;
-
+	int preemptPid = 0;
+	int highPriority = curProcess->pcb.priority;
+	
 	while(node!=NULL){
 		node->delay--;
 		if(node->delay <=0){
+			
 			msg = node->message;
+			if(procArr[msg->dest_pid]->priority < highPriority){
+				highPriority = procArr[msg->dest_pid]->priority;
+				preemptPid = msg->dest_pid;
+			}
+			
 			send_msg(msg->dest_pid, (void*)msg, 0);
 			temp = node;
 			if((node == msgDelayQueue->first) || (node == msgDelayQueue->last)){
@@ -536,6 +551,8 @@ void k_dec_delay_msg_time(){
 			node = node->next;
 		}
 	}
+	
+	return preemptPid;
 }
 
 
