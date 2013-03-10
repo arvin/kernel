@@ -1,8 +1,6 @@
 #ifndef _PROCESS_H_
 #define _PROCESS_H_
 
-#define USR_SZ_STACK 0x040
-
 #define NULL 0
 #define PRIORITY_COUNT 4
 #define INITIAL_xPSR 0x01000000    /* user process initial xPSR value */

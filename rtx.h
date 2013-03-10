@@ -5,6 +5,7 @@
 #define NULL 0
 #define TRUE 1
 #define FALSE 0
+#define MEMORY_BLOCK_SIZE 32
 
 typedef unsigned int U32;
 

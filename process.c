@@ -10,6 +10,8 @@
 #include <stdio.h>
 #endif  /* DEBUG_0 */
 
+#define STACK_SIZE_MULTIPLIER 2
+
 ProcessQueue* readyQueue;
 ProcessQueue** blockedQueues;
 ProcessQueue* blockedMsgQueues;
@@ -258,11 +260,11 @@ void init_pcb(void* process, ProcessNode* node, int priority, int isStackRequire
 
 void init_proc_stack(void* process, ProcessNode* node) {
 	int i;
-	uint32_t* stackBlockStart = (uint32_t*)k_request_memory_block();
+	uint32_t* stackBlockStart = (uint32_t*)multisize_request_memory_block(STACK_SIZE_MULTIPLIER);
 	
 	// Stack initialization
 	node->pcb.stack_boundary = stackBlockStart;
-	node->pcb.mp_sp = stackBlockStart + USR_SZ_STACK;
+	node->pcb.mp_sp = stackBlockStart + MEMORY_BLOCK_SIZE * STACK_SIZE_MULTIPLIER;
 	node->pcb.mp_sp--;
 	/* 8 bytes alignment adjustment to exception stack frame */
 	if (!(((uint32_t)node->pcb.mp_sp) & 0x04)) {
@@ -440,7 +442,7 @@ void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 void unblock_process() {
 	int i;
 	ProcessNode* node;
-	if (!hasFreeMemory())
+	if (!hasFreeMemory(1))
 		return;
 	
 	for (i = 0; i < PRIORITY_COUNT; ++i) {
@@ -571,22 +573,41 @@ void set_process_state(uint32_t process_ID, proc_state_t state) {
 void print_process(){
 		Message* crt_message = (Message*)request_memory_block();
 		Message* crt_message2 = (Message*)request_memory_block();
+		Message* crt_message3 = (Message*)request_memory_block();
 		char* data = (char*)request_memory_block();
 		char* data2 = (char*)request_memory_block();
+		char* data3 = (char*)request_memory_block();
 		char* sendTo = data;
 		char* sendTo2 = data2;
+		char* sendTo3 = data3;
+	
+	
+		int curCounter = 0;
 		int i = 0;
+	char* str;
 		int anyBlockedQueues = 0;
 		int anyBlockedRecieveQueues = 0;
 		ProcessNode* curr;
 		int sizeOfString = 0;
-		char* str = "Ready Queue:\n\r";
-		data = append_to_block((char*)data,(char*)str);
-		str = "Ready\n\r";
-		data = append_to_block((char*)data,(char*)str);
+		//char* str = "Ready Queue:\n\r";
+		//data = append_to_block((char*)data,(char*)str);
+		//str = "Ready\n\r";
+		//data = append_to_block((char*)data,(char*)str);
 		curr = readyQueue->first;
 		str = "     \n\r";
+		
 		while(curr != NULL){
+			if(curCounter == readyQueue->size / 2){
+				eos((char*)data);
+				crt_message->type = CRT_DISPLAY;
+				crt_message->dest_pid = get_system_pid(CRT);
+				crt_message->sender_pid = get_system_pid(KCD);
+				crt_message->data = (void*)sendTo;
+				send_message(get_system_pid(CRT), crt_message);
+				crt_message = (Message*)request_memory_block();
+				data = (char*)request_memory_block();
+				sendTo = data;
+			}
 			data = append_to_block((char*)data, "\r PID: ");
 			*str = curr->pcb.m_pid + '0';
 			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
@@ -595,32 +616,33 @@ void print_process(){
 			data = append_to_block((char*)data, str);
 			data = append_to_block((char*)data, "\n");
 			curr = curr->next;
+			curCounter++;
 		}
-		
+		eos((char*)data);
 		
 		str = ("Blocked Memory Queue:\n\r");
-		data = append_to_block((char*)data,(char*)str);
+		data3 = append_to_block((char*)data3,(char*)str);
 		str = "     \n\r";
 	for (i = 0; i < PRIORITY_COUNT; ++i){
 		curr = blockedQueues[i]->first;
 		while(curr!=NULL){
 			anyBlockedQueues = 1;
-			data = append_to_block((char*)data, "\r PID: ");
+			data3 = append_to_block((char*)data3, "\r PID: ");
 			*str = curr->pcb.m_pid + '0';
-			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
-			data = append_to_block((char*)data, "\r Priority: ");
+			data3 = append_to_block(data3, str); //Note might have to double check in case it's 2 digit
+			data3 = append_to_block((char*)data3, "\r Priority: ");
 			*str = curr->pcb.priority + '0';
-			data = append_to_block((char*)data, str);
-			data = append_to_block((char*)data, "\n");
+			data3 = append_to_block((char*)data3, str);
+			data3 = append_to_block((char*)data3, "\n");
 			curr = curr->next;
 		}
 	}
 	
 	if(anyBlockedQueues == 0){
 		str = ("No Blocked Queues!\n\r\n\r");
-		data = append_to_block((char*)data,(char*)str);
+		data3 = append_to_block((char*)data3,(char*)str);
 	}
-	eos((char*)data);
+	eos((char*)data3);
 	
 	
 	
@@ -704,6 +726,12 @@ void print_process(){
 		crt_message2->sender_pid = get_system_pid(KCD);
 		crt_message2->data = (void*)sendTo2;
 		send_message(get_system_pid(CRT), crt_message2);
+		
+		crt_message3->type = CRT_DISPLAY;
+		crt_message3->dest_pid = get_system_pid(CRT);
+		crt_message3->sender_pid = get_system_pid(KCD);
+		crt_message3->data = (void*)sendTo3;
+		send_message(get_system_pid(CRT), crt_message3);
 		
 }
 

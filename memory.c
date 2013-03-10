@@ -3,6 +3,7 @@
 #include "process.h"
 #include "uart.h"
 #include "atomic.h"
+#include "rtx.h"
 
 extern void* Image$$RW_IRAM1$$ZI$$Limit;
 
@@ -26,9 +27,9 @@ void memory_init() {
 	FreeMemoryList->newStartingAddress = (uint32_t)MemoryStart;
 }
 
-void setNewStartingAddress() {
+void setNewStartingAddress(int multiplier) {
 	// Notice that total size of a block is 128 bytes plus the size of a node structure
-	MemoryList->newStartingAddress = MemoryList->newStartingAddress + 64 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node);
+	MemoryList->newStartingAddress = MemoryList->newStartingAddress + MEMORY_BLOCK_SIZE * (uint32_t)sizeof(uint32_t) * multiplier + (uint32_t)sizeof(Node);
 }
 
 Node* getBlockFromFreeLinkedList() {
@@ -109,19 +110,23 @@ void *k_persistent_request_memory_block() {
 	return block;
 }
 
-// An internal API call for memory request
 void* k_request_memory_block() {
+	return multisize_request_memory_block(1);
+}
+
+// An internal API call for memory request
+void* multisize_request_memory_block(int size_multiplier) {
 
 	Node* currentNode;
 	uint32_t block;
 	atomic(0);
 	// Check if any memory has been freed
-	if(FreeMemoryList->first != NULL) {
+	if(FreeMemoryList->first != NULL && size_multiplier == 1) {
 		currentNode = getBlockFromFreeLinkedList();
 		block = (uint32_t)currentNode + (uint32_t)(sizeof(Node));
 	}		
 	//search for memory block in pool
-	else if (hasUnusedMemory()){
+	else if (hasUnusedMemory(size_multiplier)){
 		// No more memory
 		atomic(1);
 		return NULL;
@@ -130,18 +135,18 @@ void* k_request_memory_block() {
 		// Expand MemoryList
 		currentNode = (Node*) MemoryList->newStartingAddress;
 		block = MemoryList->newStartingAddress + (uint32_t)(sizeof(Node));
-		setNewStartingAddress();
+		setNewStartingAddress(size_multiplier);
 	}
 	insertToList(MemoryList, currentNode);
 	atomic(1);
 	return (void*)block;
 }
 
-int hasFreeMemory() {
-	return FreeMemoryList->first != NULL || hasUnusedMemory();
+int hasFreeMemory(int multiplier) {
+	return FreeMemoryList->first != NULL || hasUnusedMemory(multiplier);
 }
 
 // Determine if MemoryList can be expanded or not
-int hasUnusedMemory() {
-	return (MemoryList->newStartingAddress + 32 * (uint32_t)sizeof(uint32_t) + (uint32_t)sizeof(Node) >= MemoryEnd);
+int hasUnusedMemory(int multiplier) {
+	return (MemoryList->newStartingAddress + MEMORY_BLOCK_SIZE * (uint32_t)sizeof(uint32_t) * multiplier + (uint32_t)sizeof(Node) >= MemoryEnd);
 }
