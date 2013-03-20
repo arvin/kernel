@@ -13,7 +13,6 @@
 #include "rtx.h"
 
 int g_timer_count = 0;
-uint32_t wall_clk_handler = 0;
 
 /**
  * @brief: initialize timer. Only timer 0 is supported
@@ -131,29 +130,10 @@ void trigger_timer_i_process() {
 }
 
 int timer_i_process() {
-		Message *new_Message;
-		int preemptPid =k_dec_delay_msg_time();
 		g_timer_count++ ;
 		g_timer_count %= 3600*24*1000;
-		if(start_clk && (g_timer_count%1000 == 0)){
-				new_Message = (Message*) k_request_memory_block();
-				if(new_Message != NULL){
-					new_Message->sender_pid = k_get_system_pid(TIMER);
-					new_Message->dest_pid = wall_clk_handler;
-					new_Message->type = DISPLAY_TIME;
-					new_Message->data = NULL;
-					k_send_message(wall_clk_handler, new_Message);
-				}
-		}
-		return preemptPid;
-}
 
-uint32_t get_wall_clk_handler(void) {
-	return wall_clk_handler;
-}
-
-void set_wall_clk_handler(uint32_t pid) {
-	wall_clk_handler = pid;
+		return k_dec_delay_msg_time();
 }
 
 void k_set_timer_count(int time){

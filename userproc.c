@@ -138,7 +138,6 @@ void proc4(void){
 int is_valid_priority_cmd(char* a){
 	char *b = a;
 	int i = 0;
-	int timeCheck = 0;
 
 	//Check for correct length
 	while(*b != '\0'){
@@ -323,6 +322,14 @@ void proc6(void){
 	
 	set_process_priority(6, 0);
 	
+	new_Message = (Message*)request_memory_block();
+	new_Message->sender_pid = 6;
+	new_Message->dest_pid = 6;
+	new_Message->type = DISPLAY_TIME;
+	new_Message->data = NULL;
+	
+	delayed_send(6, new_Message, 1000);
+	
 	sendCRTMsg("-- RTX Test End --\n\r", 6);
 	
 	while(1){
@@ -354,14 +361,15 @@ void proc6(void){
 			}else if(string_equals(received_msg_data, "%WT")){
 				displayTime = 0;
 			}
+			release_memory_block(msg->data);
+			release_memory_block(msg);
 		}
 		else if(msg->type == DISPLAY_TIME){
 			if(displayTime)
 				display_time();
+			
+			delayed_send(6, msg, 1000);
 		}
-		
-		release_memory_block(msg->data);
-		release_memory_block(msg);
 	}
 
 }

@@ -22,8 +22,6 @@ pcb_t* procArr[11];
 ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
-uint32_t priority_handler = 0;
-
 
 void null_process(void) {
 	while(1) {
@@ -39,6 +37,7 @@ void keyboard_proc(void){
 		command_entry* cmd_table = request_memory_block();
 		int index = 0;
 		int i = 0;
+	  int messageDelivered = 0;
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 			msg_data = (char*) msg->data;
@@ -46,31 +45,26 @@ void keyboard_proc(void){
 			//Check the contents of the message
 			if(msg->type == COMMAND_REG){
 				if(contains_prefix(msg_data, "%") && index < 16){
-					for(i = 0; i < 4; i++)
+					for(i = 0; i < 2; i++)
 						cmd_table[index].cmd[i] = msg_data[i];
+					cmd_table[index].cmd[2] = '\0';
 					cmd_table[index].pid = msg->sender_pid;
+					index++;
 				}
 				
-			}else if(msg->type == COMMAND){
-				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || (contains_prefix(msg_data, "%WS"))){
-					if(get_wall_clk_handler() != 0){
-							msg->sender_pid = get_system_pid(KCD);
-							msg->dest_pid = get_wall_clk_handler();
-							send_message(get_wall_clk_handler(), msg);
-					}else{
-						release_memory_block(msg_data);
-						release_memory_block(msg);
+			}else if(msg->type == COMMAND) {
+				messageDelivered = FALSE;
+				for (i = 0; i < index; ++i) {
+					if (contains_prefix(msg_data, cmd_table[i].cmd)) {
+						msg->sender_pid = get_system_pid(KCD);
+						msg->dest_pid = cmd_table[i].pid;
+						send_message(cmd_table[i].pid, msg);
+						messageDelivered = TRUE;
 					}
 				}
-				else if (contains_prefix(msg_data, "%C")) {
-					if (priority_handler != 0) {
-						msg->sender_pid = get_system_pid(KCD);
-						msg->dest_pid = priority_handler;
-						send_message(priority_handler, msg);
-					}else{
-						release_memory_block(msg_data);
-						release_memory_block(msg);
-					}
+				if(!messageDelivered) {
+					release_memory_block(msg_data);
+					release_memory_block(msg);
 				}
 			}else if(msg->type == KEYBOARD_INPUT){
 				if(string_equals(msg_data, "!")){

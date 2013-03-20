@@ -32,7 +32,7 @@ typedef struct pcb {
 } pcb_t;
 
 typedef struct command_entry{
-	char cmd[4];
+	char cmd[3];
 	int pid;
 } command_entry;
 
