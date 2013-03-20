@@ -200,11 +200,6 @@ void proc5(void) {
 			}
 		}
 		
-		uart_put_int(target_pid);
-		uart_put_string("\n\r");
-		uart_put_int(target_priority);
-		uart_put_string("\n\r");
-		
 		release_memory_block(msg->data);
 		release_memory_block(msg);
 	}
