@@ -606,19 +606,18 @@ void print_process(){
 		char* data = (char*)request_memory_block();
 		char* data2 = (char*)request_memory_block();
 		char* data3 = (char*)request_memory_block();
+		char* str = (char*)request_memory_block();
 		char* sendTo = data;
 		char* sendTo2 = data2;
 		char* sendTo3 = data3;
 	
 		int curCounter = 0;
 		int i = 0;
-		char* str;
 		int anyBlockedQueues = 0;
 		int anyBlockedRecieveQueues = 0;
 		ProcessNode* curr;
-
+		clearString(str);
 		curr = readyQueue->first;
-		str = "     \n\r";
 		
 		while(curr != NULL){
 			if(curCounter == readyQueue->size / 2){
@@ -635,18 +634,17 @@ void print_process(){
 			data = append_to_block((char*)data, "\r PID: ");
 			*str = curr->pcb.m_pid + '0';
 			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
-			data = append_to_block((char*)data, "\r Priority: ");
+			data = append_to_block((char*)data, "\n\r Priority: ");
 			*str = curr->pcb.priority + '0';
 			data = append_to_block((char*)data, str);
-			data = append_to_block((char*)data, "\n");
+			data = append_to_block((char*)data, "\n\r");
+			data = append_to_block((char*)data, "\n\r");
 			curr = curr->next;
 			curCounter++;
 		}
 		eos((char*)data);
-		
-		str = ("Blocked Memory Queue:\n\r");
-		data3 = append_to_block((char*)data3,(char*)str);
-		str = "     \n\r";
+		clearString(str);
+		data3 = append_to_block((char*)data3,(char*)"\n\rBlocked Memory Queue:\n\r");
 	for (i = 0; i < PRIORITY_COUNT; ++i){
 		curr = blockedQueues[i]->first;
 		while(curr!=NULL){
@@ -657,26 +655,22 @@ void print_process(){
 			data3 = append_to_block((char*)data3, "\r Priority: ");
 			*str = curr->pcb.priority + '0';
 			data3 = append_to_block((char*)data3, str);
-			data3 = append_to_block((char*)data3, "\n");
+			data3 = append_to_block((char*)data3, "\n\r");
 			curr = curr->next;
 		}
 	}
 	
 	if(anyBlockedQueues == 0){
-		str = ("No Blocked Queues!\n\r\n\r");
-		data3 = append_to_block((char*)data3,(char*)str);
+		data3 = append_to_block((char*)data3,(char*)"No Blocked Queues!\n\r\n\r");
 	}
 	eos((char*)data3);
 	
 	
-	
-		str = ("Blocked Msg Queue:\n\r");
-		data2 = append_to_block((char*)data2,(char*)str);
-		str = "       \n\r";
+	clearString(str);
+		data2 = append_to_block((char*)data2,(char*)"Blocked Msg Queue:\n\r\n\r");
 		
 		curr = blockedMsgQueues->first;
 		while(curr!=NULL){
-				clearString(str);
 				anyBlockedRecieveQueues = 1;
 				data2 = append_to_block((char*)data2, "\r PID: ");
 				if (curr->pcb.m_pid >= 10){
@@ -686,8 +680,7 @@ void print_process(){
 					*str = curr->pcb.m_pid % 10 + '0';
 				}
 				data2 = append_to_block(data2, str); //Note might have to double check in case it's 2 digit
-				data2 = append_to_block((char*)data2, "\r Priority: ");
-				clearString(str);
+				data2 = append_to_block((char*)data2, "\n\r\r Priority: ");
 				*str = curr->pcb.priority + '0';
 				data2 = append_to_block((char*)data2, str);
 				data2 = append_to_block((char*)data2, "\n");
@@ -695,50 +688,11 @@ void print_process(){
 		}
 	
 		if(anyBlockedRecieveQueues == 0){
-			str = ("No Blocked Recieve Queue's!\n\r\n\r");
-			data2 = append_to_block((char*)data2,(char*)str);
+			data2 = append_to_block((char*)data2,(char*)"No Blocked Recieve Queue's!\n\r\n\r");
 		}
 	
 		eos((char*)data2);
-	/*
-
-	Print all processes on ready queue
-	uart_put_string("Ready Queue:\n\r");
-	
-	curr = readyQueue->first;
-	while(curr!=NULL){
-		uart_put_string("\r PID: ");
-		uart_put_int(curr->pcb.m_pid);
-		uart_put_string("\r Priority: ");
-		uart_put_int(curr->pcb.priority);
-		uart_put_string("\n");
-		curr = curr->next;
-	}
-	//Print all processes on blocked queue
-	uart_put_string("Blocked Memory Queue:\n");
-	for (i = 0; i < PRIORITY_COUNT; ++i){
-		curr = blockedQueues[i]->first;
-		while(curr!=NULL){
-			uart_put_string("\r PID: ");
-			uart_put_int(curr->pcb.m_pid);
-			uart_put_string("\r Priority: ");
-			uart_put_int(curr->pcb.priority);
-			uart_put_string("\n");
-			curr = curr->next;
-		}
-	}
-	//Print all processes on blocked msg queue
-	uart_put_string("Blocked Receive Queue Queue:\n");
-	curr = blockedMsgQueues->first;
-	while(curr!=NULL){
-		uart_put_string("\r PID: ");
-		uart_put_int(curr->pcb.m_pid);
-		uart_put_string("\r Priority: ");
-		uart_put_int(curr->pcb.priority);
-		uart_put_string("\n");
-		curr = curr->next;
-	}
-	*/
+		release_memory_block(str);
 		crt_message->type = CRT_DISPLAY;
 		crt_message->dest_pid = get_system_pid(CRT);
 		crt_message->sender_pid = get_system_pid(KCD);
@@ -776,7 +730,9 @@ void eos(char* block){
 }
 
 void clearString(char* str){
-	while(*str != '\0' && *str != '\n'){
-		*(str++) = ' ';
+	int i = 0;
+	for(i = 0;i<15;i++){
+			*(str+i) = ' ';
 	}
+	*(str+15) = '\0';
 }
