@@ -22,6 +22,8 @@ pcb_t* procArr[11];
 ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
+uint32_t priority_handler = 0;
+
 
 void null_process(void) {
 	while(1) {
@@ -44,6 +46,12 @@ void keyboard_proc(void){
 					set_wall_clk_handler(msg->sender_pid);
 					release_memory_block(msg_data);
 					release_memory_block(msg);
+				}else if(string_equals(msg_data, "%C")){
+					priority_handler = msg->sender_pid;
+					release_memory_block(msg_data);
+					release_memory_block(msg);
+					
+					
 				}
 			}else if(msg->type == COMMAND){
 				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || (contains_prefix(msg_data, "%WS"))){
@@ -55,7 +63,17 @@ void keyboard_proc(void){
 						release_memory_block(msg_data);
 						release_memory_block(msg);
 					}
-				} 
+				}
+				else if (contains_prefix(msg_data, "%C")) {
+					if (priority_handler != 0) {
+						msg->sender_pid = get_system_pid(KCD);
+						msg->dest_pid = priority_handler;
+						send_message(priority_handler, msg);
+					}else{
+						release_memory_block(msg_data);
+						release_memory_block(msg);
+					}
+				}
 			}else if(msg->type == KEYBOARD_INPUT){
 				if(string_equals(msg_data, "!")){
 					print_process();
@@ -171,24 +189,38 @@ void process_init() {
 
 
 int k_set_process_priority(int process_ID, int priority) {
-	ProcessNode* node = readyQueue->first;
-
-	if(process_ID == 0){
+	ProcessNode* node;
+	int highest_priority = 4;
+	
+	if(process_ID == 0 && process_ID > ProcessCount){
 		return -1;
 	}
 		
 	if (priority < 0 || priority > 3)
 		return -1;
 	
-	while(node != NULL) {
-		if (node->pcb.m_pid == process_ID) {
-			node->pcb.priority = priority;
-			return 0;
-		}
-		node = node->next;
+	//Check if the process is in blocked Queue, move it to the correct blocked queue
+	node = remove_process(blockedQueues[node->pcb.priority], process_ID);
+	if(node != NULL){
+			push_process(blockedQueues[priority], node);
+	}else{
+			//Check if node is in ready queue and get the highest priority in ready queue
+			node = readyQueue->first;
+			while(node != NULL){
+				if(node->pcb.priority < highest_priority && node->pcb.m_pid != process_ID)
+					highest_priority = node->pcb.priority;
+				node = node->next;
+			}
+			if(priority < highest_priority){
+				node = remove_process(readyQueue, process_ID);
+				if(node != NULL){
+					push_process_to_front(readyQueue, node);
+				}
+			}
+		
 	}
-	
-	return -1;
+	procArr[process_ID]->priority = priority;
+	return 0;
 }
 
 
