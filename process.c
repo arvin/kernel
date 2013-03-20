@@ -38,10 +38,19 @@ void keyboard_proc(void){
 		int index = 0;
 		int i = 0;
 	  int messageDelivered = 0;
+		
+		char* buffer;
+		int read_command = FALSE;
+		int command_index = 0;
+		
+		Message *temp;
+		Message *crtMsg;
+		char *crtData;
+	
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 			msg_data = (char*) msg->data;
-			
+
 			//Check the contents of the message
 			if(msg->type == COMMAND_REG){
 				if(contains_prefix(msg_data, "%") && index < 16){
@@ -67,11 +76,81 @@ void keyboard_proc(void){
 					release_memory_block(msg);
 				}
 			}else if(msg->type == KEYBOARD_INPUT){
-				if(string_equals(msg_data, "!")){
-					print_process();
-					release_memory_block(msg_data);
-					release_memory_block(msg);
+				if(*msg_data == '%' && !read_command){
+					read_command = TRUE;
+					command_index = 1;
+					buffer = request_memory_block();
+					*buffer = *msg_data;
+					
+				}else if(read_command == TRUE){
+					if(command_index <BUFSIZE-1){
+						
+						if(*msg_data == (char)13){ //Pressed enter, so parse command
+							temp = (Message*)request_memory_block();
+							for (i = 0; i < index; ++i) {
+								if (contains_prefix(buffer, cmd_table[i].cmd)) {
+									if(temp != NULL){
+									
+											//Create a new message and send it to the handler
+											temp->type = COMMAND;
+											temp->sender_pid = get_system_pid(KCD);
+											temp->dest_pid = cmd_table[i].pid;
+											temp->data = buffer; //REMEMBER TO DOUBLE CHECK ABOUT THE REF
+											*(buffer + command_index) = '\0';
+											send_message(cmd_table[i].pid, temp);
+
+									}
+									
+
+								}
+							}
+							
+							//Create a message to CRT to print a new line
+							crtMsg = (Message*)request_memory_block();
+							crtData = (char*)request_memory_block();
+							*crtData = '\r';
+							*(crtData+1) = '\n';
+							*(crtData+2) = '\0';
+							crtMsg->data = crtData;
+							crtMsg->type = CRT_DISPLAY;
+							crtMsg->dest_pid = get_system_pid(CRT);
+							crtMsg->sender_pid = get_system_pid(KCD);
+							//send_msg(get_system_pid(CRT), crtMsg, 0);
+							send_message(get_system_pid(CRT), crtMsg);
+							
+							read_command = FALSE;
+							command_index = 0;
+							
+						}else{
+							//Add the new char to buffer
+							*(buffer + command_index) = *msg_data;
+							command_index++;
+						}
+					}
+
+				}else{ //HOTKEY!
+					if(string_equals(msg_data, "!")){
+						print_process();
+						release_memory_block(msg_data);
+						release_memory_block(msg);
+					}
 				}
+				
+				//Print to CRT if we're putting together a command
+				if (read_command == TRUE) {
+					crtMsg = (Message*)request_memory_block();
+					crtData = (char*)request_memory_block();
+					*crtData = *(buffer+command_index-1);
+					*(crtData + 1) = '\0';
+					crtMsg->data = crtData;
+
+					crtMsg->type = CRT_DISPLAY;
+					crtMsg->dest_pid = get_system_pid(CRT);
+					crtMsg->sender_pid = get_system_pid(KCD);
+					//send_msg(get_system_pid(CRT), crtMsg, 0);
+					send_message(get_system_pid(CRT), crtMsg);
+				}
+				
 			}
 		}
 }
