@@ -137,11 +137,13 @@ int timer_i_process() {
 		g_timer_count %= 3600*24*1000;
 		if(start_clk && (g_timer_count%1000 == 0)){
 				new_Message = (Message*) k_request_memory_block();
-				new_Message->sender_pid = k_get_system_pid(TIMER);
-				new_Message->dest_pid = wall_clk_handler;
-				new_Message->type = DISPLAY_TIME;
-				new_Message->data = NULL;
-			  k_send_message(wall_clk_handler, new_Message);
+				if(new_Message != NULL){
+					new_Message->sender_pid = k_get_system_pid(TIMER);
+					new_Message->dest_pid = wall_clk_handler;
+					new_Message->type = DISPLAY_TIME;
+					new_Message->data = NULL;
+					k_send_message(wall_clk_handler, new_Message);
+				}
 		}
 		return preemptPid;
 }
