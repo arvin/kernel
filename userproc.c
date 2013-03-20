@@ -135,6 +135,54 @@ void proc4(void){
 	while (true);
 }
 
+int is_valid_priority_cmd(char* a){
+	char *b = a;
+	int i = 0;
+	int timeCheck = 0;
+
+	//Check for correct length
+	while(*b != '\0'){
+		b++;
+		i++;
+	}
+	
+	if(i > 8) //All commands of format '%C # #\0', '%C ## #\0', '%C ###\0', '%C ## ##\0'
+		return FALSE;
+
+	b = a+2; //Skip %C, was already checked by the prefix function
+
+	if(*b !=' ')
+		return FALSE;
+	b++;
+	
+	//*b MUST be a number
+	for(i=0; i<2; i++){
+		if(!(*b>='0' && *b<='9'))
+			return FALSE;
+		b++;
+		if(*b ==' ') //Can now be a space or a number
+			break;
+	}
+
+	if(*b !=' ')
+		return FALSE;
+
+	b++;
+	for(i=0; i<2; i++){
+		if(!(*b>='0' && *b<='9'))
+			return FALSE;
+		b++;
+		if(*b =='\0') //Must now be the end line character
+			break;
+	}
+
+	if(*b!='\0')
+		return FALSE;
+
+	return TRUE;
+}
+
+
 void proc5(void) {
 	
 	Message *new_Message;
@@ -168,36 +216,36 @@ void proc5(void) {
 		
 	 if(msg->type == COMMAND){
 			if(contains_prefix(received_msg_data, "%C")){
-				//NOTE ADD CHECK TO SEE IF CMD IS VALID
-				
-				
-				//Get the process_id
-				target_pid = *(received_msg_data+3) - '0';
-				index = 4;
-				temp = received_msg_data+index;
-				
-				//Check if double digit
-				if(*temp != ' '){
-					target_pid *= 10;
-					target_pid += *(received_msg_data+index) - '0';
-					index = 6;
-				}else{
+				 if(is_valid_priority_cmd(received_msg_data)){
+						//Get the process_id
+						target_pid = *(received_msg_data+3) - '0';
+						index = 4;
+						temp = received_msg_data+index;
+						
+						//Check if double digit
+						if(*temp != ' '){
+							target_pid *= 10;
+							target_pid += *(received_msg_data+index) - '0';
+							index = 6;
+						}else{
+							
+							index = 5;
+						}
+						
+						//Get the priority id
+						target_priority = *(received_msg_data+index) - '0';
+						index += 1;
+						temp = received_msg_data+index;
+						if(*temp != '\0'){
+							target_priority *= 10;
+							target_priority += *(received_msg_data+index) - '0';
+						}
+						
+						set_process_priority(target_pid, target_priority);
 					
-					index = 5;
 				}
-				
-				//Get the priority id
-				target_priority = *(received_msg_data+index) - '0';
-				index += 1;
-				temp = received_msg_data+index;
-				if(*temp != '\0'){
-					target_priority *= 10;
-					target_priority += *(received_msg_data+index) - '0';
-				}
-				
-				set_process_priority(target_pid, target_priority);
-				
 			}
+			
 		}
 		
 		release_memory_block(msg->data);
