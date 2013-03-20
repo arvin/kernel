@@ -255,6 +255,7 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 					if(*p_buffer == (char)13){
 						
 						cmdMsg = (Message*)k_request_memory_block();
+						if(cmdMsg != NULL){
 						cmdMsg->data = (void*)data_buff;
 						cmdMsg->type = COMMAND;
 						cmdMsg->dest_pid = k_get_system_pid(KCD);
@@ -274,11 +275,11 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 						inputMsg->sender_pid = k_get_system_pid(UART);
 						send_msg(k_get_system_pid(CRT), inputMsg, 0);
 	
-
+					}
 						
 						read_command = FALSE;
 						command_index = 0;
-						
+
 					}else{
 						*(data_buff + command_index) = *p_buffer;
 						command_index++;

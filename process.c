@@ -200,7 +200,7 @@ int k_set_process_priority(int process_ID, int priority) {
 		return -1;
 	
 	//Check if the process is in blocked Queue, move it to the correct blocked queue
-	node = remove_process(blockedQueues[node->pcb.priority], process_ID);
+	node = remove_process(blockedQueues[priority], process_ID);
 	if(node != NULL){
 			push_process(blockedQueues[priority], node);
 	}else{
