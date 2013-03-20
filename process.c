@@ -22,6 +22,8 @@ pcb_t* procArr[11];
 ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
+uint32_t priority_handler = 0;
+
 
 void null_process(void) {
 	while(1) {
@@ -44,6 +46,12 @@ void keyboard_proc(void){
 					set_wall_clk_handler(msg->sender_pid);
 					release_memory_block(msg_data);
 					release_memory_block(msg);
+				}else if(string_equals(msg_data, "%C")){
+					priority_handler = msg->sender_pid;
+					release_memory_block(msg_data);
+					release_memory_block(msg);
+					
+					
 				}
 			}else if(msg->type == COMMAND){
 				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || (contains_prefix(msg_data, "%WS"))){
@@ -55,7 +63,17 @@ void keyboard_proc(void){
 						release_memory_block(msg_data);
 						release_memory_block(msg);
 					}
-				} 
+				}
+				else if (contains_prefix(msg_data, "%C")) {
+					if (priority_handler != 0) {
+						msg->sender_pid = get_system_pid(KCD);
+						msg->dest_pid = priority_handler;
+						send_message(priority_handler, msg);
+					}else{
+						release_memory_block(msg_data);
+						release_memory_block(msg);
+					}
+				}
 			}else if(msg->type == KEYBOARD_INPUT){
 				if(string_equals(msg_data, "!")){
 					print_process();

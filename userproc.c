@@ -136,11 +136,78 @@ void proc4(void){
 }
 
 void proc5(void) {
-	sendCRTMsg("Test 5: CHECK IF CRT PRINTS THE MESSAGE.\n\r", 4);
 	
-	do
-		release_processor();
-	while (true);
+	Message *new_Message;
+	Message *msg;
+	char* message_data;
+	char* s = "%C";
+	int sender_id = 0;
+	char* received_msg_data;
+	char* temp;
+	int target_pid;
+	int target_priority;
+	int index;
+	
+	sendCRTMsg("Test 5: CHANGE A PROCESS's PRIORITY.\n\r", 5);
+	
+	new_Message = (Message*)request_memory_block();
+	message_data = (char*)request_memory_block();
+	message_data = s;
+ 	
+	new_Message->data = (void*) message_data;
+	new_Message->sender_pid = 5;
+	new_Message->dest_pid = get_system_pid(KCD);
+	new_Message->type = COMMAND_REG;
+
+	send_message(get_system_pid(KCD), (void*) new_Message);
+	
+	while(1){
+		msg = (Message*)receive_message(& sender_id);
+
+		received_msg_data =  (msg->data);
+		
+	 if(msg->type == COMMAND){
+			if(contains_prefix(received_msg_data, "%C")){
+				//NOTE ADD CHECK TO SEE IF CMD IS VALID
+				
+				
+				//Get the process_id
+				target_pid = *(received_msg_data+3) - '0';
+				index = 4;
+				temp = received_msg_data+index;
+				
+				//Check if double digit
+				if(*temp != ' '){
+					target_pid *= 10;
+					target_pid += *(received_msg_data+index) - '0';
+					index = 6;
+				}else{
+					
+					index = 5;
+				}
+				
+				//Get the priority id
+				target_priority = *(received_msg_data+index) - '0';
+				index += 1;
+				temp = received_msg_data+index;
+				if(*temp != '\0'){
+					target_priority *= 10;
+					target_priority += *(received_msg_data+index) - '0';
+				}
+				
+				set_process_priority(target_pid, target_priority);
+				
+			}
+		}
+		
+		uart_put_int(target_pid);
+		uart_put_string("\n\r");
+		uart_put_int(target_priority);
+		uart_put_string("\n\r");
+		
+		release_memory_block(msg->data);
+		release_memory_block(msg);
+	}
 }
 
 
