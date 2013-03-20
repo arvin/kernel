@@ -36,23 +36,21 @@ void keyboard_proc(void){
     Message *msg;
 		char* msg_data;
 	  int sender_id = get_system_pid(KCD); //random id;
+		command_entry* cmd_table = request_memory_block();
+		int index = 0;
+		int i = 0;
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 			msg_data = (char*) msg->data;
 			
 			//Check the contents of the message
 			if(msg->type == COMMAND_REG){
-				if(string_equals(msg_data, "%W")){
-					set_wall_clk_handler(msg->sender_pid);
-					release_memory_block(msg_data);
-					release_memory_block(msg);
-				}else if(string_equals(msg_data, "%C")){
-					priority_handler = msg->sender_pid;
-					release_memory_block(msg_data);
-					release_memory_block(msg);
-					
-					
+				if(contains_prefix(msg_data, "%") && index < 16){
+					for(i = 0; i < 4; i++)
+						cmd_table[index].cmd[i] = msg_data[i];
+					cmd_table[index].pid = msg->sender_pid;
 				}
+				
 			}else if(msg->type == COMMAND){
 				if(string_equals(msg_data, "%WT") || string_equals(msg_data, "%WR") || (contains_prefix(msg_data, "%WS"))){
 					if(get_wall_clk_handler() != 0){

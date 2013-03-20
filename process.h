@@ -31,6 +31,11 @@ typedef struct pcb {
 	MessageQueue msgQueue;
 } pcb_t;
 
+typedef struct command_entry{
+	char cmd[4];
+	int pid;
+} command_entry;
+
 typedef struct ProcessNode {
 	pcb_t pcb;
 	struct ProcessNode* next;
