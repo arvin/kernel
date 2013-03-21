@@ -75,7 +75,7 @@ void shift_ready_process(int pid);
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt, void* system_reserved_block);
 void k_display_time(void);
 int k_get_system_pid(system_proc_type type);
-void print_process(void);
+void k_print_process(void);
 char* append_to_block(char* block, char* str);
 void eos(char* block);
 void clear(char* block);

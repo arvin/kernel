@@ -278,7 +278,7 @@ void process_init() {
 	
 	// Print process initialization
 	print_process_memory = multisize_request_memory_block(1, TRUE);
-	print_process_data = multisize_request_memory_block(3, TRUE);
+	print_process_data = multisize_request_memory_block(5, TRUE);
 	print_process_temp = multisize_request_memory_block(1, TRUE);
 }
 
@@ -694,10 +694,10 @@ void set_process_state(uint32_t process_ID, proc_state_t state) {
 	procArr[process_ID]->m_state = state;
 }
 
-void print_process(){
-		Message* crt_message = (Message*)request_memory_block();
-		char* data = (char*)request_memory_block();
-		char* str = (char*)request_memory_block();
+void k_print_process(){
+		Message* crt_message = (Message*)print_process_memory;
+		char* data = (char*)print_process_data;
+		char* str = (char*)print_process_temp;
 		char* sendTo = data;
 	
 		int curCounter = 0;
@@ -707,19 +707,8 @@ void print_process(){
 		ProcessNode* curr;
 		clearString(str);
 		curr = readyQueue->first;
-		
+				data = append_to_block((char*)data,(char*)"Ready Queue:\n\r");
 		while(curr != NULL){
-			if(curCounter == readyQueue->size / 2){
-				eos((char*)data);
-				crt_message->type = CRT_DISPLAY;
-				crt_message->dest_pid = get_system_pid(CRT);
-				crt_message->sender_pid = get_system_pid(KCD);
-				crt_message->data = (void*)sendTo;
-				send_message(get_system_pid(CRT), crt_message);
-				crt_message = (Message*)request_memory_block();
-				data = (char*)request_memory_block();
-				sendTo = data;
-			}
 			data = append_to_block((char*)data, "\r PID: ");
 			*str = curr->pcb.m_pid + '0';
 			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
@@ -758,6 +747,7 @@ void print_process(){
 		
 		curr = blockedMsgQueues->first;
 		while(curr!=NULL){
+				clearString(str);
 				anyBlockedRecieveQueues = 1;
 				data = append_to_block((char*)data, "\r PID: ");
 				if (curr->pcb.m_pid >= 10){
@@ -768,6 +758,7 @@ void print_process(){
 				}
 				data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
 				data = append_to_block((char*)data, "\n\r\r Priority: ");
+				clearString(str);
 				*str = curr->pcb.priority + '0';
 				data = append_to_block((char*)data, str);
 				data = append_to_block((char*)data, "\n");
@@ -779,12 +770,11 @@ void print_process(){
 		}
 	
 		eos((char*)data);
-		release_memory_block(str);
 		crt_message->type = CRT_DISPLAY;
-		crt_message->dest_pid = get_system_pid(CRT);
-		crt_message->sender_pid = get_system_pid(KCD);
+		crt_message->dest_pid = k_get_system_pid(CRT);
+		crt_message->sender_pid = k_get_system_pid(KCD);
 		crt_message->data = (void*)sendTo;
-		send_message(get_system_pid(CRT), crt_message);
+		send_msg(k_get_system_pid(CRT), crt_message,0, str);
 }
 
 char* append_to_block(char* block, char* str){
@@ -806,7 +796,7 @@ void eos(char* block){
 void clearString(char* str){
 	int i = 0;
 	for(i = 0;i<15;i++){
-			*(str+i) = ' ';
+			*(str+i) = '\0';
 	}
 	*(str+15) = '\0';
 }

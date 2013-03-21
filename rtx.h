@@ -82,4 +82,8 @@ extern void k_set_timer_count(int time);
 #define set_timer_count(time) _set_timer_count((U32)k_set_timer_count, time)
 void _set_timer_count(U32 p_func, int time) __SVC_0;
 
+extern void k_print_process(void);
+#define print_process() _print_process((U32)k_print_process)
+void _print_process(U32 p_func) __SVC_0;
+
 #endif /* !_RTX_H_ */
