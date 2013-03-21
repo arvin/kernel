@@ -60,7 +60,8 @@ void keyboard_proc(void){
 					cmd_table[index].pid = msg->sender_pid;
 					index++;
 				}
-				
+				release_memory_block(msg_data);
+				release_memory_block(msg);
 			}else if(msg->type == COMMAND) {
 				messageDelivered = FALSE;
 				for (i = 0; i < index; ++i) {
@@ -130,9 +131,9 @@ void keyboard_proc(void){
 
 				}else{ //HOTKEY!
 					if(string_equals(msg_data, "!")){
-						print_process();
 						release_memory_block(msg_data);
 						release_memory_block(msg);
+						print_process();
 					}
 				}
 				
@@ -150,6 +151,9 @@ void keyboard_proc(void){
 					//send_msg(get_system_pid(CRT), crtMsg, 0);
 					send_message(get_system_pid(CRT), crtMsg);
 				}
+				
+				release_memory_block(msg_data);
+				release_memory_block(msg);
 				
 			}
 		}
