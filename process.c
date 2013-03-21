@@ -672,15 +672,9 @@ void set_process_state(uint32_t process_ID, proc_state_t state) {
 
 void print_process(){
 		Message* crt_message = (Message*)request_memory_block();
-		Message* crt_message2 = (Message*)request_memory_block();
-		Message* crt_message3 = (Message*)request_memory_block();
 		char* data = (char*)request_memory_block();
-		char* data2 = (char*)request_memory_block();
-		char* data3 = (char*)request_memory_block();
 		char* str = (char*)request_memory_block();
 		char* sendTo = data;
-		char* sendTo2 = data2;
-		char* sendTo3 = data3;
 	
 		int curCounter = 0;
 		int i = 0;
@@ -713,75 +707,60 @@ void print_process(){
 			curr = curr->next;
 			curCounter++;
 		}
-		eos((char*)data);
 		clearString(str);
-		data3 = append_to_block((char*)data3,(char*)"\n\rBlocked Memory Queue:\n\r");
+		data = append_to_block((char*)data,(char*)"\n\rBlocked Memory Queue:\n\r");
 	for (i = 0; i < PRIORITY_COUNT; ++i){
 		curr = blockedQueues[i]->first;
 		while(curr!=NULL){
 			anyBlockedQueues = 1;
-			data3 = append_to_block((char*)data3, "\r PID: ");
+			data = append_to_block((char*)data, "\r PID: ");
 			*str = curr->pcb.m_pid + '0';
-			data3 = append_to_block(data3, str); //Note might have to double check in case it's 2 digit
-			data3 = append_to_block((char*)data3, "\r Priority: ");
+			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
+			data = append_to_block((char*)data, "\r Priority: ");
 			*str = curr->pcb.priority + '0';
-			data3 = append_to_block((char*)data3, str);
-			data3 = append_to_block((char*)data3, "\n\r");
+			data = append_to_block((char*)data, str);
+			data = append_to_block((char*)data, "\n\r");
 			curr = curr->next;
 		}
 	}
 	
 	if(anyBlockedQueues == 0){
-		data3 = append_to_block((char*)data3,(char*)"No Blocked Queues!\n\r\n\r");
+		data = append_to_block((char*)data,(char*)"No Blocked Queues!\n\r\n\r");
 	}
-	eos((char*)data3);
 	
 	
 	clearString(str);
-		data2 = append_to_block((char*)data2,(char*)"Blocked Msg Queue:\n\r\n\r");
+		data = append_to_block((char*)data,(char*)"Blocked Msg Queue:\n\r\n\r");
 		
 		curr = blockedMsgQueues->first;
 		while(curr!=NULL){
 				anyBlockedRecieveQueues = 1;
-				data2 = append_to_block((char*)data2, "\r PID: ");
+				data = append_to_block((char*)data, "\r PID: ");
 				if (curr->pcb.m_pid >= 10){
 					*(str) = curr->pcb.m_pid / 10 + '0';
 					*(str+1) = curr->pcb.m_pid % 10 + '0';
 				}else{
 					*str = curr->pcb.m_pid % 10 + '0';
 				}
-				data2 = append_to_block(data2, str); //Note might have to double check in case it's 2 digit
-				data2 = append_to_block((char*)data2, "\n\r\r Priority: ");
+				data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
+				data = append_to_block((char*)data, "\n\r\r Priority: ");
 				*str = curr->pcb.priority + '0';
-				data2 = append_to_block((char*)data2, str);
-				data2 = append_to_block((char*)data2, "\n");
+				data = append_to_block((char*)data, str);
+				data = append_to_block((char*)data, "\n");
 				curr = curr->next;
 		}
 	
 		if(anyBlockedRecieveQueues == 0){
-			data2 = append_to_block((char*)data2,(char*)"No Blocked Recieve Queue's!\n\r\n\r");
+			data = append_to_block((char*)data,(char*)"No Blocked Recieve Queue's!\n\r\n\r");
 		}
 	
-		eos((char*)data2);
+		eos((char*)data);
 		release_memory_block(str);
 		crt_message->type = CRT_DISPLAY;
 		crt_message->dest_pid = get_system_pid(CRT);
 		crt_message->sender_pid = get_system_pid(KCD);
 		crt_message->data = (void*)sendTo;
 		send_message(get_system_pid(CRT), crt_message);
-		
-		crt_message2->type = CRT_DISPLAY;
-		crt_message2->dest_pid = get_system_pid(CRT);
-		crt_message2->sender_pid = get_system_pid(KCD);
-		crt_message2->data = (void*)sendTo2;
-		send_message(get_system_pid(CRT), crt_message2);
-		
-		crt_message3->type = CRT_DISPLAY;
-		crt_message3->dest_pid = get_system_pid(CRT);
-		crt_message3->sender_pid = get_system_pid(KCD);
-		crt_message3->data = (void*)sendTo3;
-		send_message(get_system_pid(CRT), crt_message3);
-		
 }
 
 char* append_to_block(char* block, char* str){
