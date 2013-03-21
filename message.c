@@ -6,8 +6,11 @@ void addMessage(MessageQueue* queue, Message* msg, int delay, void* system_reser
 	MessageNode* node = (MessageNode*)k_request_memory_block();
 	if (node == NULL)
 		node = system_reserved_block;
-	if (node == NULL)
+	if (node == NULL){
+		k_release_memory_block(msg->data);
+		k_release_memory_block(msg);
 		return;
+	}
 	
 	atomic(0);
 	node->message = msg;
