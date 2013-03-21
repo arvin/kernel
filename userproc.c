@@ -12,6 +12,20 @@ int passCount = 0;
 int procStage = 0;
 int start_clk;
 
+
+typedef struct MsgNode{
+    Message* message;
+    struct MsgNode* next;
+    struct MsgNode* prev;
+}MsgNode;
+
+typedef struct MsgQueue{
+    MsgNode* first;
+    MsgNode* last;
+    int size;
+}MsgQueue;
+
+
 void sendCRTMsg(char* msg, int sender_pid){
 	Message* crt_msg;
 	crt_msg = (Message*) request_memory_block();
@@ -33,7 +47,7 @@ void proc1(void) {
 	
 	sendCRTMsg("-- RTX Test Start --\n\rTest 1: Delayed Receive\n\r", 1);
 	
-	msg = (Message*)receive_message(& sender_id);
+	/*msg = (Message*)receive_message(& sender_id);
 	msgNum =  (msg->data);
 	
 	if (procStage == 1 && *msgNum == 9999) {
@@ -43,7 +57,7 @@ void proc1(void) {
 		sendCRTMsg("Test 1: FAILED\n\r", 1);
 	
 	release_memory_block(msg->data);
-	release_memory_block(msg);
+	release_memory_block(msg);*/
 	
 	do
 		release_processor();
@@ -375,13 +389,137 @@ void proc6(void){
 }
 
 
+void proc7(void){ //Process A
+    Message* new_Message;
+    int sender_id;
+    char* message_data;
+    int* num;
+    
+    new_Message = (Message*)request_memory_block();
+		message_data = (char*)request_memory_block();
+		string_copy(message_data, "%Z");
+ 	
+		new_Message->data = (void*) message_data;
+		new_Message->sender_pid = 2;
+		new_Message->dest_pid = get_system_pid(KCD);
+		new_Message->type = COMMAND_REG;
+    
+		send_message(get_system_pid(KCD), (void*) new_Message);  //register me
+    
+    while(1){
+        new_Message = (Message*)receive_message(&sender_id);
+        message_data = new_Message->data;
+        if(string_equals(message_data, "%Z")){
+            release_memory_block(new_Message->data);
+            release_memory_block(new_Message);
+            break;
+        }
+    }
+    
+    num = (int*) request_memory_block();
+    *num = 0;
+    while (1) {
+        //Their pseudocode asks us to use this as a message envelope
+        new_Message = (Message*)request_memory_block();  //should we be using MessageNode here?
+        new_Message->type = COUNT_REPORT;
+        new_Message->data = (void*) num;
+        send_message(3, new_Message);
+        *num = *num +1;
+        release_processor();
+    }
+}
+
+
+void proc8(void){ //Process B
+    Message* new_Message;
+    int sender_id;
+    
+    while(1){
+        new_Message = (Message*)receive_message(&sender_id);
+        send_message(4, new_Message);
+    }
+}
+
+void proc9(void){ //Process C
+    Message* p;
+    Message* q;
+    MsgNode* temp;
+    char* message_data;
+    int sender_id;
+    int* msgNum;
+    
+    //Queue related data structures --were made global.
+    
+    MsgQueue* queue = (MsgQueue*) request_memory_block();
+    queue->first = NULL;
+    queue->last = NULL;
+    queue->size = 0;
+    
+    
+    while(1){
+        if(queue->size == 0)
+            p = (Message*)receive_message(&sender_id);
+        else{
+            temp = queue->first;
+            p = temp->message;
+            queue->first = temp->next;
+            if(queue->last == temp)
+                queue->last = NULL;
+            queue->size--;
+            release_memory_block(temp);
+        }
+        
+        if(p->type == COUNT_REPORT){
+            msgNum = (int*)(p->data);
+            if((*msgNum) % 20 ==0){
+                
+                message_data = (char*)request_memory_block();
+                string_copy(message_data, "PROCESS C");
+                
+                p->data = (void*) message_data;
+                p->sender_pid = 9;
+                p->dest_pid = get_system_pid(CRT);
+                p->type = CRT_DISPLAY;
+								send_message( get_system_pid(CRT), p);
+                
+                //hibernate for 10 seconds
+                q = (Message*)request_memory_block();
+                q->sender_pid = 4;
+                p->type = WAKEUP10;
+                delayed_send(4, (void*)q, 10000);
+                while(1){
+                    p = (Message*) receive_message(&sender_id);
+                    if(p->type==WAKEUP10)
+                        break;
+                    else{
+                        //Add to local message queue
+                        temp = (MsgNode*)request_memory_block();
+                        temp->message=p;
+                        temp->next = NULL;
+                        temp->prev = queue->last;
+												if(queue->last)
+													queue->last->next = temp;
+                        queue->last = temp;
+                        if(queue->first==NULL)
+                            queue->first=temp;
+                    }
+                }
+                
+            }
+        }
+        release_memory_block(p->data);
+        release_memory_block(p);
+        release_processor();
+    }
+}
+
 
 int ProcessCount = 6;
 void* ProcessTable[] = {
 	&proc1,
-	&proc2,
-	&proc3,
-	&proc4,
+	&proc7,
+	&proc8,
+	&proc9,
 	&proc5,
 	&proc6
 };

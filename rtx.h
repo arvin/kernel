@@ -23,7 +23,7 @@ typedef struct Message{
 	  void* data;
 }Message;
 
-typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND, DISPLAY_TIME} msg_type;
+typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND, DISPLAY_TIME, COUNT_REPORT, WAKEUP10} msg_type;
 
 typedef enum {TIMER = 0, UART, KCD, CRT} system_proc_type;
 

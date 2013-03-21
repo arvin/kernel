@@ -85,6 +85,10 @@ int k_release_memory_block(void* memory_block){
 		temp = MemoryList->first;
 		while(temp!= NULL){
 				if((uint32_t)memory_block == (uint32_t)temp + (uint32_t)sizeof(Node) ){
+					if (temp->is_system_reserved){
+						atomic(1);
+						return 0;
+					}
 					removeFromList(MemoryList, temp);
 					insertToList(FreeMemoryList, temp);
 					// Unblock any processes if possible
@@ -111,11 +115,15 @@ void *k_persistent_request_memory_block() {
 }
 
 void* k_request_memory_block() {
-	return multisize_request_memory_block(1);
+	return multisize_request_memory_block(1, FALSE);
+}
+
+void* request_system_memory_block() {
+	return multisize_request_memory_block(1, TRUE);
 }
 
 // An internal API call for memory request
-void* multisize_request_memory_block(int size_multiplier) {
+void* multisize_request_memory_block(int size_multiplier, int is_system_reserved) {
 
 	Node* currentNode;
 	uint32_t block;
@@ -123,6 +131,7 @@ void* multisize_request_memory_block(int size_multiplier) {
 	// Check if any memory has been freed
 	if(FreeMemoryList->first != NULL && size_multiplier == 1) {
 		currentNode = getBlockFromFreeLinkedList();
+		currentNode->is_system_reserved = is_system_reserved;
 		block = (uint32_t)currentNode + (uint32_t)(sizeof(Node));
 	}		
 	//search for memory block in pool
@@ -134,6 +143,7 @@ void* multisize_request_memory_block(int size_multiplier) {
 	else {
 		// Expand MemoryList
 		currentNode = (Node*) MemoryList->newStartingAddress;
+		currentNode->is_system_reserved = is_system_reserved;
 		block = MemoryList->newStartingAddress + (uint32_t)(sizeof(Node));
 		setNewStartingAddress(size_multiplier);
 	}

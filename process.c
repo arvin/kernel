@@ -360,7 +360,7 @@ void init_pcb(void* process, ProcessNode* node, int priority, int isStackRequire
 
 void init_proc_stack(void* process, ProcessNode* node) {
 	int i;
-	uint32_t* stackBlockStart = (uint32_t*)multisize_request_memory_block(STACK_SIZE_MULTIPLIER);
+	uint32_t* stackBlockStart = (uint32_t*)multisize_request_memory_block(STACK_SIZE_MULTIPLIER, FALSE);
 	
 	// Stack initialization
 	node->pcb.stack_boundary = stackBlockStart;
@@ -569,9 +569,17 @@ int k_send_message(int process_ID, void *messageEnvelope) {
 
 int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
 	ProcessNode* node;
+	int i;
 	pcb_t* target = procArr[process_ID];
 	Message* msg = (Message*)messageEnvelope;
-	addMessage(&(target->msgQueue), msg, 0);
+	while(1){
+		i = addMessage(&(target->msgQueue), msg, 0, !allowPreempt);
+		if(i == 0)
+			break;
+		else if(allowPreempt)
+			k_release_processor(INSUFFICIENT_MEMORY);
+	}
+		
 	
 	node = remove_process(blockedMsgQueues, process_ID);
 	if (node != NULL) {
@@ -591,7 +599,7 @@ int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
 
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
 	Message* msg = (Message*)MessageEnvelope;
-	addMessage(msgDelayQueue, msg, delay);
+	addMessage(msgDelayQueue, msg, delay, TRUE);
 	return 0;
 }
 
@@ -624,7 +632,6 @@ int k_dec_delay_msg_time(){
 				preemptPid = msg->dest_pid;
 			}
 			
-			send_msg(msg->dest_pid, (void*)msg, 0);
 			temp = node;
 			if((node == msgDelayQueue->first) || (node == msgDelayQueue->last)){
 				if(msgDelayQueue->first == msgDelayQueue->last){
@@ -647,6 +654,7 @@ int k_dec_delay_msg_time(){
 			node = node->next;
 			msgDelayQueue->size--;
 			k_release_memory_block(temp);
+			send_msg(msg->dest_pid, (void*)msg, 0);
 		}
 		else{
 			prev = node;

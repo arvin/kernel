@@ -13,6 +13,7 @@ struct Node
 {
 	Node* next;
 	Node* prev;
+	int is_system_reserved;
 };
 
 struct LinkedList
@@ -35,7 +36,8 @@ int k_release_memory_block(void* memory_block);
 
 void* k_persistent_request_memory_block(void);
 void* k_request_memory_block(void);
-void* multisize_request_memory_block(int multiplier);
+void* request_system_memory_block(void);
+void* multisize_request_memory_block(int multiplier, int is_system_reserved);
 
 int hasFreeMemory(int multiplier);
 int hasUnusedMemory(int multiplier); // Determine if FreeMemory has any unused memory

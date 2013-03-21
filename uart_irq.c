@@ -11,6 +11,7 @@ volatile int read_command = FALSE;
 volatile uint8_t command_buffer[BUFSIZE];
 volatile uint32_t command_index = 0;
 volatile char* data_buff;
+volatile void* timer_reserved_memory[2];
 /**
  * @brief: initialize the n_uart
  * NOTES: only fully supports uart0 so far, but can be easily extended 
@@ -21,6 +22,9 @@ volatile char* data_buff;
 int uart_init(int n_uart) {
 
 	LPC_UART_TypeDef *pUart;
+	
+	timer_reserved_memory[0] = request_system_memory_block();
+	timer_reserved_memory[1] = request_system_memory_block();
 
 	if (n_uart ==0 ) {
 		/*
@@ -244,8 +248,14 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 		LPC_UART0->IER = IER_THRE | IER_RLS; 
 		g_UART0_count = 0;
 		while ( len != 0 ) {
+			
 			inputMsg = (Message*)k_request_memory_block();
+			if (inputMsg == NULL)
+				inputMsg = timer_reserved_memory[0];
 			inputData = (char*)k_request_memory_block();
+			if (inputData == NULL)
+				inputData = (char*)timer_reserved_memory[1];
+			
 			*inputData = *p_buffer;
 			*(inputData + 1) = '\0';
 			inputMsg->data = inputData;
