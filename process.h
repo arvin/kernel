@@ -72,7 +72,7 @@ void* k_receive_message(int* sender_id);
 void* system_proc_receive_message(system_proc_type type);
 int k_dec_delay_msg_time(void);
 void shift_ready_process(int pid);
-int send_msg(int process_ID, void *messageEnvelope, int allowPreempt);
+int send_msg(int process_ID, void *messageEnvelope, int allowPreempt, void* system_reserved_block);
 void k_display_time(void);
 int k_get_system_pid(system_proc_type type);
 void print_process(void);

@@ -10,8 +10,8 @@
 int main() {
 	SystemInit();
 	atomic(0);
-	uart_init(0);
 	memory_init();
+	uart_init(0);
 	process_init();
 	timer_init(0);
 	atomic(1);
