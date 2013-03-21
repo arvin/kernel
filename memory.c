@@ -142,7 +142,7 @@ void* multisize_request_memory_block(int size_multiplier) {
 	return (void*)block;
 }
 
-int hasFreeMemory(int multiplier) {
+int k_has_free_memory(int multiplier) {
 	return FreeMemoryList->first != NULL || hasUnusedMemory(multiplier);
 }
 
