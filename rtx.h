@@ -38,6 +38,10 @@ extern void* k_persistent_request_memory_block(void);
 #define request_memory_block() _request_memory_block((U32)k_persistent_request_memory_block)
 void* _request_memory_block(U32 p_func) __SVC_0;
 
+extern int k_has_free_memory(int multiplier);
+#define has_free_memory() _has_free_memory((U32)k_has_free_memory, 1)
+void* _has_free_memory(U32 p_func, int multiplier) __SVC_0;
+
 extern int k_release_memory_block(void* memory_block);
 #define release_memory_block(memory_block) _release_memory_block((U32)k_release_memory_block, memory_block)
 int _release_memory_block(U32 p_func, void* memory_block) __SVC_0;

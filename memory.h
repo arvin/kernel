@@ -37,7 +37,7 @@ void* k_persistent_request_memory_block(void);
 void* k_request_memory_block(void);
 void* multisize_request_memory_block(int multiplier);
 
-int hasFreeMemory(int multiplier);
+int k_has_free_memory(int multiplier);
 int hasUnusedMemory(int multiplier); // Determine if FreeMemory has any unused memory
 
 #endif
