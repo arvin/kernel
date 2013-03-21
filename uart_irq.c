@@ -11,7 +11,7 @@ volatile int read_command = FALSE;
 volatile uint8_t command_buffer[BUFSIZE];
 volatile uint32_t command_index = 0;
 volatile char* data_buff;
-volatile void* timer_reserved_memory[2];
+volatile void* timer_reserved_memory[3];
 /**
  * @brief: initialize the n_uart
  * NOTES: only fully supports uart0 so far, but can be easily extended 
@@ -25,6 +25,7 @@ int uart_init(int n_uart) {
 	
 	timer_reserved_memory[0] = request_system_memory_block();
 	timer_reserved_memory[1] = request_system_memory_block();
+	timer_reserved_memory[2] = request_system_memory_block();
 
 	if (n_uart ==0 ) {
 		/*
@@ -251,7 +252,7 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 			
 			inputMsg = (Message*)k_request_memory_block();
 			if (inputMsg == NULL)
-				inputMsg = timer_reserved_memory[0];
+				inputMsg = (Message*)timer_reserved_memory[0];
 			inputData = (char*)k_request_memory_block();
 			if (inputData == NULL)
 				inputData = (char*)timer_reserved_memory[1];
@@ -262,7 +263,7 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 			inputMsg->type = KEYBOARD_INPUT;
 			inputMsg->dest_pid = k_get_system_pid(KCD);
 			inputMsg->sender_pid = k_get_system_pid(UART);
-			send_msg(k_get_system_pid(KCD), inputMsg, 0);
+			send_msg(k_get_system_pid(KCD), inputMsg, 0, timer_reserved_memory[2]);
 			
 			
 			

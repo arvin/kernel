@@ -2,19 +2,16 @@
 #include "process.h"
 #include "atomic.h"
 
-void* message_reserved_memory;
-
-void message_init() {
-	message_reserved_memory = request_system_memory_block();
-}
-
-int addMessage(MessageQueue* queue, Message* msg, int delay, int is_system_message){
+int addMessage(MessageQueue* queue, Message* msg, int delay, void* system_reserved_block){
 	MessageNode* node = (MessageNode*)k_request_memory_block();	
-	if(node == NULL) {
-		if (!is_system_message)
-			return -1;
-		node = (MessageNode*)message_reserved_memory;
+	if(node == NULL)
+		node = system_reserved_block;
+	if (node == NULL) {
+		k_release_memory_block(msg->data);
+		k_release_memory_block(msg);
+		return -1;
 	}
+	
 	atomic(0);
 	node->message = msg;
 	node->delay = delay;

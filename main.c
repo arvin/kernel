@@ -12,7 +12,6 @@ int main() {
 	SystemInit();
 	atomic(0);
 	memory_init();
-	message_init();
 	uart_init(0);
 	process_init();
 	timer_init(0);

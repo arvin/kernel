@@ -130,9 +130,9 @@ void keyboard_proc(void){
 
 				}else{ //HOTKEY!
 					if(string_equals(msg_data, "!")){
-						print_process();
 						release_memory_block(msg_data);
 						release_memory_block(msg);
+						print_process();
 					}
 				}
 				
@@ -194,7 +194,7 @@ void k_display_time(){
 		*(data++) = '\r';
 		*(data++) = '\0';
 	
-		send_msg(k_get_system_pid(CRT), crt_message, 0);
+		send_msg(k_get_system_pid(CRT), crt_message, 0, NULL);
 
 }
 
@@ -563,23 +563,16 @@ void unblock_process() {
 
 
 int k_send_message(int process_ID, void *messageEnvelope) {
-	return send_msg(process_ID, messageEnvelope, 1);
+	return send_msg(process_ID, messageEnvelope, 1, NULL);
 }
 
 
-int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
+int send_msg(int process_ID, void *messageEnvelope, int allowPreempt, void* system_reserved_block) {
 	ProcessNode* node;
 	int i;
 	pcb_t* target = procArr[process_ID];
 	Message* msg = (Message*)messageEnvelope;
-	while(1){
-		i = addMessage(&(target->msgQueue), msg, 0, !allowPreempt);
-		if(i == 0)
-			break;
-		else if(allowPreempt)
-			k_release_processor(INSUFFICIENT_MEMORY);
-	}
-		
+	addMessage(&(target->msgQueue), msg, 0, system_reserved_block);
 	
 	node = remove_process(blockedMsgQueues, process_ID);
 	if (node != NULL) {
@@ -599,7 +592,7 @@ int send_msg(int process_ID, void *messageEnvelope, int allowPreempt) {
 
 int k_delayed_send(int process_ID, void *MessageEnvelope, int delay){
 	Message* msg = (Message*)MessageEnvelope;
-	addMessage(msgDelayQueue, msg, delay, TRUE);
+	addMessage(msgDelayQueue, msg, delay, NULL);
 	return 0;
 }
 
@@ -654,7 +647,7 @@ int k_dec_delay_msg_time(){
 			node = node->next;
 			msgDelayQueue->size--;
 			k_release_memory_block(temp);
-			send_msg(msg->dest_pid, (void*)msg, 0);
+			send_msg(msg->dest_pid, (void*)msg, 0, NULL);
 		}
 		else{
 			prev = node;
