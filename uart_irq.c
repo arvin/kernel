@@ -11,6 +11,7 @@ volatile int read_command = FALSE;
 volatile uint8_t command_buffer[BUFSIZE];
 volatile uint32_t command_index = 0;
 volatile char* data_buff;
+volatile void* system_reserved_memory[3];
 /**
  * @brief: initialize the n_uart
  * NOTES: only fully supports uart0 so far, but can be easily extended 
@@ -22,6 +23,10 @@ int uart_init(int n_uart) {
 
 	LPC_UART_TypeDef *pUart;
 
+	system_reserved_memory[0] = multisize_request_memory_block(1, TRUE);
+	system_reserved_memory[1] = multisize_request_memory_block(1, TRUE);
+	system_reserved_memory[2] = multisize_request_memory_block(1, TRUE);
+	
 	if (n_uart ==0 ) {
 		/*
 		Steps 1 & 2: system control configuration.
@@ -245,14 +250,20 @@ void uart_i_process( /*uint8_t *p_buffer, uint32_t len*/ ){
 		g_UART0_count = 0;
 		while ( len != 0 ) {
 			inputMsg = (Message*)k_request_memory_block();
+			if (inputMsg == NULL)
+				inputMsg = (Message*)system_reserved_memory[0];
+			
 			inputData = (char*)k_request_memory_block();
+			if (inputData == NULL)
+				inputData = (char*)system_reserved_memory[1];
+			
 			*inputData = *p_buffer;
 			*(inputData + 1) = '\0';
 			inputMsg->data = inputData;
 			inputMsg->type = KEYBOARD_INPUT;
 			inputMsg->dest_pid = k_get_system_pid(KCD);
 			inputMsg->sender_pid = k_get_system_pid(UART);
-			send_msg(k_get_system_pid(KCD), inputMsg, 0);
+			send_msg(k_get_system_pid(KCD), inputMsg, 0, (void*)system_reserved_memory[2]);
 			
 			
 			
