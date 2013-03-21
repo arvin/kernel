@@ -3,7 +3,7 @@
 
 // Constants
 #define NULL 0
-#define TRUE 1
+#define TRUE 0xFFFFFFFF
 #define FALSE 0
 #define MEMORY_BLOCK_SIZE 32
 

@@ -23,6 +23,10 @@ ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
 
+void* print_process_memory;
+void* print_process_data;
+void* print_process_temp;
+
 void null_process(void) {
 	while(1) {
 		release_processor();
@@ -272,6 +276,10 @@ void process_init() {
 	init_pcb(&crt_proc, systemProcesses[CRT], 0, TRUE);
 	push_process(readyQueue, systemProcesses[CRT]);
 	
+	// Print process initialization
+	print_process_memory = multisize_request_memory_block(1, TRUE);
+	print_process_data = multisize_request_memory_block(3, TRUE);
+	print_process_temp = multisize_request_memory_block(1, TRUE);
 }
 
 
@@ -376,7 +384,7 @@ void init_pcb(void* process, ProcessNode* node, int priority, int isStackRequire
 
 void init_proc_stack(void* process, ProcessNode* node) {
 	int i;
-	uint32_t* stackBlockStart = (uint32_t*)multisize_request_memory_block(STACK_SIZE_MULTIPLIER);
+	uint32_t* stackBlockStart = (uint32_t*)multisize_request_memory_block(STACK_SIZE_MULTIPLIER, FALSE);
 	
 	// Stack initialization
 	node->pcb.stack_boundary = stackBlockStart;
