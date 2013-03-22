@@ -461,16 +461,18 @@ void proc9(void){ //Process C
     
     
     while(1){
-        if(queue->size == 0)
+        if(queue->first == NULL)
             p = (Message*)receive_message(&sender_id);
         else{
 						temp = queue->first;
-					  queue->first = temp->next;
-					  temp->next = NULL;
-						if(queue->last == temp)
-							queue->last = NULL;
-						queue->size--;
 						p = temp->message;
+						queue->first = temp->next;
+						if (queue->first == NULL) {
+							queue->last = NULL;
+						}
+						temp->next = NULL;
+						queue->size--;
+						
         }
         
         if(p->type == COUNT_REPORT){
@@ -488,7 +490,7 @@ void proc9(void){ //Process C
                 q->sender_pid = 9;
 								q->dest_pid = 9;
                 q->type = WAKEUP10;
-                delayed_send(9, (void*)q, 1000);
+                delayed_send(9, (void*)q, 10000);
                 while(1){
                     p = (Message*) receive_message(&sender_id);
                     if(p->type==WAKEUP10)
@@ -497,14 +499,16 @@ void proc9(void){ //Process C
                         //Add to local message queue
 												temp = (MsgNode*)request_memory_block();
 											  temp->message = p;
-												temp->next = NULL;
-                        if(queue->last)
-													queue->last->next = temp;
-												queue->last = temp;
-												if(queue->first == 	NULL)
+													temp->next = NULL;
+												if (queue->first == NULL) {
 													queue->first = temp;
+												}
+												else {
+													queue->last->next = temp;
+												}
+												queue->last = temp;
 												queue->size++;
-                    }
+											}
                 }
                 
             }
