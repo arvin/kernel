@@ -12,10 +12,15 @@ int passCount = 0;
 int procStage = 0;
 int start_clk;
 
+typedef struct MsgNode{
+    Message* message;
+    struct MsgNode* next;
+}MsgNode;
+
 
 typedef struct MsgQueue{
-    Message* first;
-    Message* last;
+    MsgNode* first;
+    MsgNode* last;
     int size;
 }MsgQueue;
 
@@ -442,6 +447,7 @@ void proc8(void){ //Process B
 void proc9(void){ //Process C
     Message* p;
     Message* q;
+		MsgNode* temp;
     char* message_data;
     int sender_id;
     int* msgNum;
@@ -458,12 +464,13 @@ void proc9(void){ //Process C
         if(queue->size == 0)
             p = (Message*)receive_message(&sender_id);
         else{
-            p = queue->first;
-            queue->first = p->next;
-						p->next = NULL;
-            if(queue->last == p)
-                queue->last = NULL;
-            queue->size--;
+						temp = queue->first;
+					  queue->first = temp->next;
+					  temp->next = NULL;
+						if(queue->last == temp)
+							queue->last = NULL;
+						queue->size--;
+						p = temp->message;
         }
         
         if(p->type == COUNT_REPORT){
@@ -488,12 +495,14 @@ void proc9(void){ //Process C
                         break;
                     else{
                         //Add to local message queue
-												p->next = NULL;
+												temp = (MsgNode*)request_memory_block();
+											  temp->message = p;
+												temp->next = NULL;
                         if(queue->last)
-													queue->last->next = p;
-												queue->last = p;
+													queue->last->next = temp;
+												queue->last = temp;
 												if(queue->first == 	NULL)
-													queue->first = p;
+													queue->first = temp;
 												queue->size++;
                     }
                 }
