@@ -18,7 +18,7 @@ ProcessQueue* blockedMsgQueues;
 ProcessNode* curProcess;
 ProcessNode* nullProcessNode;
 
-pcb_t* procArr[11];
+pcb_t* procArr[14];
 ProcessNode* systemProcesses[4];
 MessageQueue* msgDelayQueue;
 int newProcessId = 0;				/* Must be unique */
@@ -278,7 +278,7 @@ void process_init() {
 	
 	// Print process initialization
 	print_process_memory = multisize_request_memory_block(1, TRUE);
-	print_process_data = multisize_request_memory_block(5, TRUE);
+	print_process_data = multisize_request_memory_block(6, TRUE);
 	print_process_temp = multisize_request_memory_block(1, TRUE);
 }
 
@@ -648,7 +648,6 @@ int k_dec_delay_msg_time(){
 				preemptPid = msg->dest_pid;
 			}
 			
-			send_msg(msg->dest_pid, (void*)msg, 0, NULL);
 			temp = node;
 			if((node == msgDelayQueue->first) || (node == msgDelayQueue->last)){
 				if(msgDelayQueue->first == msgDelayQueue->last){
@@ -671,6 +670,7 @@ int k_dec_delay_msg_time(){
 			node = node->next;
 			msgDelayQueue->size--;
 			k_release_memory_block(temp);
+			send_msg(msg->dest_pid, (void*)msg, 0, NULL);
 		}
 		else{
 			prev = node;
@@ -729,9 +729,10 @@ void k_print_process(){
 			data = append_to_block((char*)data, "\r PID: ");
 			*str = curr->pcb.m_pid + '0';
 			data = append_to_block(data, str); //Note might have to double check in case it's 2 digit
-			data = append_to_block((char*)data, "\r Priority: ");
+			data = append_to_block((char*)data, "\n\r Priority: ");
 			*str = curr->pcb.priority + '0';
 			data = append_to_block((char*)data, str);
+			data = append_to_block((char*)data, "\n\r");
 			data = append_to_block((char*)data, "\n\r");
 			curr = curr->next;
 		}
@@ -761,7 +762,7 @@ void k_print_process(){
 				clearString(str);
 				*str = curr->pcb.priority + '0';
 				data = append_to_block((char*)data, str);
-				data = append_to_block((char*)data, "\n");
+				data = append_to_block((char*)data, "\n\r");
 				curr = curr->next;
 		}
 	

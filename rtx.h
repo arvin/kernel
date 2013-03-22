@@ -17,13 +17,14 @@ extern int start_clk;
 // User API
 
 typedef struct Message{
-    int sender_pid;
-	  int dest_pid;
-	  int type;
-	  void* data;
+	int sender_pid;
+	int dest_pid;
+	int type;
+	void* data;
+	struct Message* next;
 }Message;
 
-typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND, DISPLAY_TIME} msg_type;
+typedef enum{KEYBOARD_INPUT = 0, CRT_DISPLAY, COMMAND_REG, COMMAND, DISPLAY_TIME, COUNT_REPORT, WAKEUP10} msg_type;
 
 typedef enum {TIMER = 0, UART, KCD, CRT} system_proc_type;
 
