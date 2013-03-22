@@ -518,7 +518,7 @@ void push_process(ProcessQueue* queue, ProcessNode* node) {
 }
 
 
-// Add process to the back of the specified queue
+// Add process to the front of the specified queue
 void push_process_to_front(ProcessQueue* queue, ProcessNode* node) {
 	if (queue->first == NULL) {		
 		queue->last = node;
