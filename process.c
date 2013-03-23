@@ -51,6 +51,8 @@ void keyboard_proc(void){
 		Message *crtMsg;
 		char *crtData;
 	
+		
+	
 	  while(1){
 			msg = (Message *)receive_message(&sender_id);
 			msg_data = (char*) msg->data;
@@ -150,23 +152,24 @@ void keyboard_proc(void){
 				}
 				
 				//Print to CRT if we're putting together a command
-				if (read_command == TRUE && has_free_memory()) {
-					crtMsg = (Message*)request_memory_block();
-					if (has_free_memory()) {
-						crtData = (char*)request_memory_block();
-						*crtData = *(buffer+command_index-1);
-						*(crtData + 1) = '\0';
-						crtMsg->data = crtData;
+			if (read_command == TRUE && has_free_memory()) {
+				crtMsg = (Message*)request_memory_block();
+				if (has_free_memory()) {
+					crtData = (char*)request_memory_block();
+					*crtData = *(buffer+command_index-1);
+					*(crtData + 1) = '\0';
+					crtMsg->data = crtData;
 
-						crtMsg->type = CRT_DISPLAY;
-						crtMsg->dest_pid = get_system_pid(CRT);
-						crtMsg->sender_pid = get_system_pid(KCD);
-						//send_msg(get_system_pid(CRT), crtMsg, 0);
-						send_message(get_system_pid(CRT), crtMsg);
-					}
-					else
-						release_memory_block(crtMsg);
+					crtMsg->type = CRT_DISPLAY;
+					crtMsg->dest_pid = get_system_pid(CRT);
+					crtMsg->sender_pid = get_system_pid(KCD);
+					//send_msg(get_system_pid(CRT), crtMsg, 0);
+					send_message(get_system_pid(CRT), crtMsg);
 				}
+				else
+					release_memory_block(crtMsg);
+				}
+	
 				
 				release_memory_block(msg_data);
 				release_memory_block(msg);
