@@ -461,9 +461,9 @@ void proc9(void){ //Process C
     
     
     while(1){
-        if(queue->first == NULL)
+        if(queue->first == NULL){
             p = (Message*)receive_message(&sender_id);
-        else{
+        }else{
 						temp = queue->first;
 						p = temp->message;
 						queue->first = temp->next;
@@ -478,19 +478,19 @@ void proc9(void){ //Process C
         if(p->type == COUNT_REPORT){
             msgNum = (int*)(p->data);
             if((*msgNum) % 20 ==0){
-                
                 string_copy(p->data, "PROCESS C");
                 p->sender_pid = 9;
                 p->dest_pid = get_system_pid(CRT);
                 p->type = CRT_DISPLAY;
 								send_message( get_system_pid(CRT), p);
-                
+                //uart_put_string("6\n\r");
                 //hibernate for 10 seconds
                 q = (Message*)request_memory_block();
+								//uart_put_string("7\n\r");
                 q->sender_pid = 9;
 								q->dest_pid = 9;
                 q->type = WAKEUP10;
-                delayed_send(9, (void*)q, 10000);
+                delayed_send(9, (void*)q, 10);
                 while(1){
                     p = (Message*) receive_message(&sender_id);
                     if(p->type==WAKEUP10)

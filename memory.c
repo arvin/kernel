@@ -130,7 +130,7 @@ void* multisize_request_memory_block(int size_multiplier, int is_system_reserved
 		block = (uint32_t)currentNode + (uint32_t)(sizeof(Node));
 	}		
 	//search for memory block in pool
-	else if (hasUnusedMemory(size_multiplier)){
+	else if (!hasUnusedMemory(size_multiplier)){
 		// No more memory
 		atomic(1);
 		return NULL;
@@ -153,5 +153,5 @@ int k_has_free_memory(int multiplier) {
 
 // Determine if MemoryList can be expanded or not
 int hasUnusedMemory(int multiplier) {
-	return (MemoryList->newStartingAddress + MEMORY_BLOCK_SIZE * (uint32_t)sizeof(uint32_t) * multiplier + (uint32_t)sizeof(Node) >= MemoryEnd);
+	return (MemoryList->newStartingAddress + MEMORY_BLOCK_SIZE * (uint32_t)sizeof(uint32_t) * multiplier + (uint32_t)sizeof(Node) < MemoryEnd);
 }
