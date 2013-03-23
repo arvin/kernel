@@ -427,6 +427,15 @@ int k_voluntarily_release_processor() {
 	return k_release_processor(RDY);
 }
 
+__asm void switch_proc()
+{
+	PRESERVE8
+	IMPORT switch_process
+	PUSH{r0-r11, lr}
+	BL switch_process
+	POP{r0-r11, pc}
+	BX lr
+} 
 
 // This is an internal API call for releasing current process with a new specified state
 int k_release_processor(proc_state_t newState) {
@@ -445,7 +454,8 @@ int k_release_processor(proc_state_t newState) {
 			push_process(blockedMsgQueues, curProcess);
 			break;
 	}
-	switch_process();
+	
+	switch_proc();
 	return 0;
 }
 
