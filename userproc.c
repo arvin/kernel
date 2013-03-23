@@ -423,13 +423,16 @@ void proc7(void){ //Process A
     *num = 0;
     while (1) {
         //Their pseudocode asks us to use this as a message envelope
-        new_Message = (Message*)request_memory_block();  //should we be using MessageNode here?
+        new_Message = (Message*)request_memory_block();
         new_Message->type = COUNT_REPORT;
 				new_Message->data = request_memory_block();
+				new_Message->sender_pid = 7;
+				new_Message->dest_pid = 8;
         *((int*)(new_Message->data)) =  *num;
         send_message(8, new_Message);
         *num = *num +1;
         release_processor();
+				new_Message = NULL;
     }
 }
 
@@ -483,10 +486,8 @@ void proc9(void){ //Process C
                 p->dest_pid = get_system_pid(CRT);
                 p->type = CRT_DISPLAY;
 								send_message( get_system_pid(CRT), p);
-                //uart_put_string("6\n\r");
                 //hibernate for 10 seconds
                 q = (Message*)request_memory_block();
-								//uart_put_string("7\n\r");
                 q->sender_pid = 9;
 								q->dest_pid = 9;
                 q->type = WAKEUP10;

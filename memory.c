@@ -92,8 +92,8 @@ int k_release_memory_block(void* memory_block){
 					removeFromList(MemoryList, temp);
 					insertToList(FreeMemoryList, temp);
 					// Unblock any processes if possible
-					unblock_process();
 					atomic(1);
+					unblock_process();
 					return 0; //Success
 				}
 				temp = temp->next;
