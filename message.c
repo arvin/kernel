@@ -59,7 +59,7 @@ Message* removeMessage(MessageQueue* queue, int* sender_id, int blocking) {
 		}
 		
 		if (blocking)
-			save_release_processor();
+			k_release_processor(MSG_WAIT);
 	} while (blocking);
 	
 	return NULL;
@@ -69,14 +69,8 @@ Message* removeMessage(MessageQueue* queue, int* sender_id, int blocking) {
 // Note: This is required for removeMessage since the value of queue is lost during release processor even if queue is defined to be volatile
 __asm void save_release_processor(void)
 {
-	PRESERVE8
-	IMPORT wait_on_message
-	PUSH{r4-r11, lr}
-	BL wait_on_message
-	POP{r4-r11, lr}
-	BX lr
 }
 
 void wait_on_message() {
-	k_release_processor(MSG_WAIT);
+	
 }
